@@ -4,7 +4,7 @@ const User = require('../models/User');
 
 exports.register = async (req, res) => {
   try {
-    const { name, email, password, role, nativePlace } = req.body;
+    const { name, email, password, role, nativePlaces } = req.body;
     const existing = await User.findOne({ email });
     if (existing) return res.status(400).json({ message: 'Email exists' });
     const salt = await bcrypt.genSalt(10);
@@ -14,8 +14,8 @@ exports.register = async (req, res) => {
       email,
       passwordHash,
       role: role || 'user',
-      nativePlaces:user.nativePlaces,
-        linkedEmails:user.linkedEmails,
+      nativePlaces:[],
+      linkedEmails:[],
     });
     await user.save();
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
