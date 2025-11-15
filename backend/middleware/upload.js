@@ -1,4 +1,4 @@
-const multer = require('multer');
+/*const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
@@ -45,4 +45,21 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
 });
 
+module.exports = upload; */
+
+
+const multer = require("multer");
+
+const upload = multer({
+  storage: multer.memoryStorage(), // Store file in buffer
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB
+  fileFilter(req, file, cb) {
+    const allowed = ["image/jpeg", "image/png", "image/jpg", "image/webp"];
+    allowed.includes(file.mimetype)
+      ? cb(null, true)
+      : cb(new Error("❌ Only JPG/PNG/WEBP allowed"), false);
+  },
+});
+
 module.exports = upload;
+

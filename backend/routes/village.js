@@ -8,7 +8,7 @@ const villageController = require('../controllers/villageController');
 router.post('/', auth, villageController.createVillage);
 
 // List / search / paginate
-router.get('/',  villageController.listVillages); //auth,
+router.get('/',  auth,villageController.listVillages); //auth,
 
 // Get single
 router.get('/:id', auth, villageController.getVillage);

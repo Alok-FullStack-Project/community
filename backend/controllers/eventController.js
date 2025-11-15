@@ -1,5 +1,6 @@
 const Event = require('../models/Event');
 const EventImage = require('../models/EventImage');
+const imagekit = require("../utils/imagekit");
 
 /**
  * Create new Event
@@ -13,7 +14,20 @@ exports.createEvent = async (req, res) => {
       return res.status(400).json({ message: 'Name is required' });
     }
 
-      const image = req.file ? `/uploads/events/${req.file.filename}` : undefined;
+     let image = "";
+        if (req.file) {
+          const uploadRes = await imagekit.upload({
+            file: req.file.buffer,
+            fileName: req.file.originalname,
+            folder: "/advertise",
+          });
+    
+          image = uploadRes.url;
+        }
+    
+    
+
+   //   const image = req.file ? `/uploads/events/${req.file.filename}` : undefined;
 
     const event = new Event({
       name: name.trim(),
@@ -104,7 +118,18 @@ exports.updateEvent = async (req, res) => {
     if (name !== undefined) event.name = String(name).trim();
     if (description !== undefined) event.description = description;
     if (publish !== undefined) event.publish = !!publish;
-    if (coverImage !== undefined) event.coverImage = coverImage;
+    //if (coverImage !== undefined) event.coverImage = coverImage;
+
+    if (req.file) {
+          const uploadRes = await imagekit.upload({
+            file: req.file.buffer,
+            fileName: req.file.originalname,
+            folder: "/advertise",
+          });
+         // image = uploadRes.url;
+        event.coverImage = uploadRes.url;
+        }
+    
 
     event.modifiedUser = req.user?._id;
     await event.save();

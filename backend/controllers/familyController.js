@@ -1,6 +1,7 @@
 const Family = require("../models/Family");
 const FamilyMember = require("../models/FamilyMember");
 const mongoose = require("mongoose");
+const imagekit = require("../utils/imagekit");
 
 const PREFIX = '42KPS';
 
@@ -83,14 +84,22 @@ const generateMemberCode = async (familyId) => {
 // ➕ Create Family (with optional members)
 exports.createFamily = async (req, res) => {
   try {
-
-    console.log(req.body);
     const {  name, gender, village, members = [] } = req.body;
 
      // Generate family head code
     const headId = await generateFamilyCode();
 
-     const image = req.file ? `/uploads/family/${req.file.filename}` : undefined;
+        //    const image = req.file ? `/uploads/family/${req.file.filename}` : undefined;
+        let image = "";
+          if (req.file) {
+            const uploadRes = await imagekit.upload({
+              file: req.file.buffer,
+              fileName: req.file.originalname,
+              folder: "/advertise",
+            });
+      
+            image = uploadRes.url;
+          }
 
     // Create Family first
     const family = new Family({
@@ -365,7 +374,17 @@ exports.addMember = async (req, res) => {
       // Generate member code
     const memberID = await generateMemberCode(familyId);
 
-      const image = req.file ? `/uploads/family/${req.file.filename}` : undefined;
+     // const image = req.file ? `/uploads/family/${req.file.filename}` : undefined;
+     let image = "";
+          if (req.file) {
+            const uploadRes = await imagekit.upload({
+              file: req.file.buffer,
+              fileName: req.file.originalname,
+              folder: "/advertise",
+            });
+      
+            image = uploadRes.url;
+          }
 
     const member = new FamilyMember({ ...req.body, familyId, memberID,image });
     await member.save();

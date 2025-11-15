@@ -70,7 +70,7 @@ const EventDetails = () => {
           {/* Event Image */}
           {event.coverImage ? (
             <img
-              src={`${backend_url}${event.coverImage}`} 
+              src={event.coverImage}
               alt={event.name}
               className="w-full h-80 object-cover rounded-lg mb-6"
             />

@@ -1,5 +1,6 @@
 // controllers/advertiseController.js
 const Advertise = require('../models/Advertise');
+const imagekit = require("../utils/imagekit");
 
 /**
  * Create new advertise
@@ -7,8 +8,20 @@ const Advertise = require('../models/Advertise');
  */
 exports.createAdvertise = async (req, res) => {
   try {
+ let image = "";
+    if (req.file) {
+      const uploadRes = await imagekit.upload({
+        file: req.file.buffer,
+        fileName: req.file.originalname,
+        folder: "/advertise",
+      });
+
+      image = uploadRes.url;
+    }
+
+
     const { name, startDate, endDate, publish } = req.body;
-    const image = req.file ? `/uploads/advertise/${req.file.filename}` : undefined;
+    //const image = req.file ? `/uploads/advertise/${req.file.filename}` : undefined;
 
     const advertise = new Advertise({
       name,
@@ -98,12 +111,24 @@ exports.updateAdvertise = async (req, res) => {
     const advertise = await Advertise.findById(req.params.id);
     if (!advertise) return res.status(404).json({ message: 'Advertise not found' });
 
+     //let image = "";
+    if (req.file) {
+      const uploadRes = await imagekit.upload({
+        file: req.file.buffer,
+        fileName: req.file.originalname,
+        folder: "/advertise",
+      });
+
+     // image = uploadRes.url;
+     advertise.image = uploadRes.url;
+    }
+
     const { name, startDate, endDate, publish } = req.body;
     if (name) advertise.name = name;
     if (startDate) advertise.startDate = startDate;
     if (endDate) advertise.endDate = endDate;
     if (publish !== undefined) advertise.publish = publish === 'true';
-    if (req.file) advertise.image = `/uploads/advertise/${req.file.filename}`;
+   //if (req.file) advertise.image = `/uploads/advertise/${req.file.filename}`;
     advertise.modifiedUser = req.user._id;
 
     await advertise.save();

@@ -117,6 +117,20 @@ function App() {
         <Route path="add-family" element={<AddFamily />} />
         <Route path="edit-family/:familyId/:memberId" element={<FamilyEdit />} />
       </Route>
+
+       {/* User Dashboard */}
+      <Route
+        path="/dashboard/user"
+        element={
+          <ProtectedRoute roles={['user']}>
+            <ManagerLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route path="family-list" element={<FamilyList role="user" />} />
+        <Route path="add-family" element={<AddFamily />} />
+        <Route path="edit-family/:familyId/:memberId" element={<FamilyEdit />} />
+      </Route>
     </Routes>
   );
 }

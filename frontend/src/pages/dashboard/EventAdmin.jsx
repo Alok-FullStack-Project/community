@@ -52,14 +52,14 @@ const EventAdmin = () => {
         <div className="grid md:grid-cols-3 gap-4">
           {events.map(event => (
             <div key={event._id} className="border p-4 rounded shadow-sm">
-              {event.coverImage && <img src={`${backend_url}${event.coverImage}`}  alt={event.name} className="h-40 w-full object-cover mb-2 rounded" />}
+              {event.coverImage && <img src={event.coverImage}  alt={event.name} className="h-40 w-full object-cover mb-2 rounded" />}
               <h3 className="text-lg font-bold">{event.name}</h3>
               <p>{event.description}</p>
               <p className="text-sm mt-1">{event.publish ? 'Published' : 'Unpublished'}</p>
               <div className="flex space-x-2 mt-2">
-                <Link to={`/dashboard/admin/edit-event/${event._id}`} className="px-2 py-1 bg-green-500 text-white rounded">Edit</Link>
+                <Link to={`/dashboard/admin/events/edit/${event._id}`} className="px-2 py-1 bg-green-500 text-white rounded">Edit</Link>
                 <button onClick={() => deleteEvent(event._id)} className="px-2 py-1 bg-red-500 text-white rounded">Delete</button>
-                <Link to={`/dashboard/admin/event-images/${event._id}`} className="px-2 py-1 bg-blue-500 text-white rounded">Manage Images</Link>
+                <Link to={`/dashboard/admin/events/images/${event._id}`} className="px-2 py-1 bg-blue-500 text-white rounded">Manage Images</Link>
               </div>
             </div>
           ))}

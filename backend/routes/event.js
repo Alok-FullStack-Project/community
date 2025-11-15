@@ -8,7 +8,7 @@ const upload = require('../middleware/upload');
 router.post('/', auth, upload.single('coverImage'),eventController.createEvent);
 router.get('/',  eventController.listEvents); //auth,
 router.get('/:id', auth, eventController.getEvent);
-router.put('/:id', auth, eventController.updateEvent);
+router.put('/:id', auth,upload.single('coverImage'), eventController.updateEvent);
 router.delete('/:id', auth, eventController.deleteEvent);
 
 // Event Images CRUD

@@ -67,7 +67,7 @@ const Advertise = () => {
                     <div className="h-48 bg-gray-100 flex items-center justify-center">
                       {img ? (
                         <img
-                          src={`${backend_url}${ad.image}`} 
+                          src={ad.image}
                           alt={ad.name}
                           className="h-full w-full object-cover"
                         />

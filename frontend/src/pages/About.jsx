@@ -68,7 +68,7 @@ const About = () => {
                 >
                   {event.coverImage ? (
                     <img
-                      src={`${backend_url}${event.coverImage}`} 
+                      src={event.coverImage}
                       alt={event.name}
                       className="h-32 w-full object-cover rounded-md mb-2"
                     />
@@ -127,7 +127,7 @@ const About = () => {
                   >
                     {ad.image ? (
                       <img
-                        src={`${backend_url}${ad.image}`} 
+                        src={ad.image}
                         alt={ad.name}
                         className="h-32 w-full object-cover rounded-md mb-2"
                       />

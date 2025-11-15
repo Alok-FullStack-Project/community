@@ -34,14 +34,37 @@ exports.createVillage = async (req, res) => {
  */
 exports.listVillages = async (req, res) => {
   try {
+    const user = req.user; // logged-in user from auth middleware
+
+    // ----------------------------------------
+    // 1️⃣ REPRESENTATIVE → return assigned villages ONLY
+    // ----------------------------------------
+    if (user?.role === "representative") {
+      const assignedVillages = user.nativePlaces || [];
+       let villages = [];
+      villages = await Village.find({
+        name : { $in: user.nativePlaces }
+      });
+     
+      return res.json({
+        total: villages.length,
+        page: 1,
+        limit: villages.length,
+        totalPages: 1,
+        data: villages,
+      });
+    }
+
+    // ----------------------------------------
+    // 2️⃣ ADMIN / MANAGER → normal flow (search, pagination)
+    // ----------------------------------------
     const { q, page = 1, limit = 20, publish } = req.query;
 
     const filters = {};
-    if (q) filters.name = new RegExp(q, 'i');
+    if (q) filters.name = new RegExp(q, "i");
+
     if (publish !== undefined) {
-      // allow query param publish=true/false
-      if (publish === 'true') filters.publish = true;
-      else if (publish === 'false') filters.publish = false;
+      filters.publish = publish === "true";
     }
 
     const pageNum = Math.max(1, parseInt(page, 10) || 1);
@@ -49,6 +72,7 @@ exports.listVillages = async (req, res) => {
     const skip = (pageNum - 1) * limitNum;
 
     const total = await Village.countDocuments(filters);
+
     const villages = await Village.find(filters)
       .sort({ createdDate: -1 })
       .skip(skip)
@@ -63,10 +87,11 @@ exports.listVillages = async (req, res) => {
       data: villages,
     });
   } catch (err) {
-    console.error('listVillages error:', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error("listVillages error:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };
+
 
 /**
  * Get single village by id
@@ -75,7 +100,8 @@ exports.listVillages = async (req, res) => {
 exports.getVillage = async (req, res) => {
   try {
     const { id } = req.params;
-    const village = await Village.findById(id).lean();
+  const village = await Village.findById(id).lean();
+ 
     if (!village) return res.status(404).json({ message: 'Village not found' });
     res.json(village);
   } catch (err) {

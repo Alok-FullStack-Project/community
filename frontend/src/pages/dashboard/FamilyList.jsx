@@ -1,22 +1,20 @@
+// --- Imports ---
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
 
-  const backend_url = import.meta.env.VITE_URL ;
-  const API_BASE = import.meta.env.VITE_API_URL + '/family';
-  const VILLAGE_API = import.meta.env.VITE_API_URL + '/villages';
+const backend_url = import.meta.env.VITE_URL;
+const API_BASE = import.meta.env.VITE_API_URL + '/family';
+const VILLAGE_API = import.meta.env.VITE_API_URL + '/villages';
 
-
-// 🔹 API Helpers
+// --- API Helpers ---
 const deleteFamily = async (familyId, token) => {
-  await axios.delete(`${API_BASE}/${familyId}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+  await axios.delete(`${API_BASE}/${familyId}`, { headers: { Authorization: `Bearer ${token}` } });
 };
 
 const deleteMember = async (familyId, memberId, token) => {
   await axios.delete(`${API_BASE}/${familyId}/member/${memberId}`, {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${token}` }
   });
 };
 
@@ -43,20 +41,19 @@ const FamilyList = ({ role }) => {
 
   const navigate = useNavigate();
 
-  // 🔹 Get logged-in user from localStorage
+  // --- Get logged-in user ---
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
+    if (storedUser) setUser(JSON.parse(storedUser));
   }, []);
 
-  // 🔹 Fetch Families
+  // --- Fetch Families ---
   const fetchFamilies = async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
       const params = { page, limit: 10 };
+
       if (searchTerm) params.q = searchTerm;
       if (selectedVillage) params.village = selectedVillage;
 
@@ -75,7 +72,7 @@ const FamilyList = ({ role }) => {
     }
   };
 
-  // 🔹 Fetch Villages
+  // --- Fetch Villages ---
   const fetchVillages = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -94,99 +91,54 @@ const FamilyList = ({ role }) => {
     fetchVillages();
   }, [page, selectedVillage]);
 
-  // 🔹 Debounce Search
+  // --- Debounced search ---
   useEffect(() => {
-    const delay = setTimeout(() => {
-      fetchFamilies();
-    }, 500);
+    const delay = setTimeout(() => fetchFamilies(), 400);
     return () => clearTimeout(delay);
   }, [searchTerm]);
 
-  // 🔹 Helper: Check if representative has permission
+  // --- Permission Logic ---
   const hasPermission = (family) => {
-    if (user?.role === 'admin') return true;
-    if (user?.role === 'representative') {
-      const assignedVillages = user?.nativePlaces || [];
-      const assignedEmails = user?.linkedEmails || [];
-      return (
-        assignedVillages.includes(family.village) ||
-        assignedEmails.includes(family.email)
-      );
+    if (!user) return false;
+
+    // --- ADMIN ---
+    if (user.role === 'admin') return true;
+
+    // --- REPRESENTATIVE ---
+    if (user.role === 'representative') {
+      const assignedVillages = user.nativePlaces || [];
+      return assignedVillages.includes(family.village);
     }
+
+    // --- USER ---
+    if (user.role === 'user') {
+      const assignedEmails = user.linkedEmails || [];
+      return assignedEmails.includes(family.email);
+    }
+
     return false;
   };
 
-  // 🔹 Toggle Family Expand
-  const toggleFamily = (familyId) => {
+  // Toggle expand
+  const toggleFamily = (id) => {
     setExpandedFamilies((prev) =>
-      prev.includes(familyId)
-        ? prev.filter((id) => id !== familyId)
-        : [...prev, familyId]
+      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
     );
   };
 
-  // 🔹 Member Modal
+  // Member Modal
   const handleViewMember = (member) => {
     setSelectedMember(member);
     setShowModal(true);
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
-    setSelectedMember(null);
   };
 
   const handleAddFamily = () => {
     navigate(`/dashboard/${role}/add-family`);
   };
 
-  // 🔹 Pagination
-  const handlePageChange = (newPage) => {
-    if (newPage >= 1 && newPage <= totalPages) {
-      setPage(newPage);
-    }
-  };
-
-  // 🔹 Delete Family
-  const handleDeleteFamily = async (familyId) => {
-    if (!window.confirm('Are you sure you want to delete this family and all its members?')) return;
-    try {
-      const token = localStorage.getItem('token');
-      await deleteFamily(familyId, token);
-      alert('Family deleted successfully');
-      fetchFamilies();
-    } catch (err) {
-      console.error(err);
-      alert('Failed to delete family');
-    }
-  };
-
-  // 🔹 Delete Member
-  const handleDeleteMember = async (familyId, memberId) => {
-    if (!window.confirm('Are you sure you want to remove this member from the family?')) return;
-    try {
-      const token = localStorage.getItem('token');
-      await deleteMember(familyId, memberId, token);
-      alert('Member removed successfully');
-      fetchFamilies();
-    } catch (err) {
-      console.error(err);
-      alert('Failed to delete member');
-    }
-  };
-
-  // 🔹 Reassign Head
-  const handleReassignHead = async (familyId, memberId) => {
-    if (!window.confirm('Promote this member as new Family Head?')) return;
-    try {
-      const token = localStorage.getItem('token');
-      await reassignHead(familyId, memberId, token);
-      alert('Family head reassigned successfully');
-      fetchFamilies();
-    } catch (err) {
-      console.error(err);
-      alert('Failed to reassign head');
-    }
+  // Pagination
+  const handlePageChange = (p) => {
+    if (p >= 1 && p <= totalPages) setPage(p);
   };
 
   return (
@@ -199,14 +151,15 @@ const FamilyList = ({ role }) => {
           {/* Village Filter */}
           <select
             value={selectedVillage}
-            onChange={(e) => setSelectedVillage(e.target.value)}
+            onChange={(e) => {
+              setSelectedVillage(e.target.value);
+              setPage(1);
+            }}
             className="border border-gray-300 rounded p-2"
           >
             <option value="">All Villages</option>
             {villages.map((v) => (
-              <option key={v._id} value={v.name}>
-                {v.name}
-              </option>
+              <option key={v._id} value={v.name}>{v.name}</option>
             ))}
           </select>
 
@@ -218,20 +171,20 @@ const FamilyList = ({ role }) => {
               setSearchTerm(e.target.value);
               setPage(1);
             }}
-            placeholder="Search by name, email, or mobile"
             className="border border-gray-300 rounded p-2 w-60"
+            placeholder="Search by name, email, mobile"
           />
 
-          {/* Add Family (only for Admin or Representative with assigned villages) */}
-          {(user?.role === 'admin' ||
-            (user?.role === 'representative' && (user?.nativePlaces?.length > 0 || user?.linkedEmails?.length > 0))) && (
+          {/* Add Family (Admin and Representative only) */}
+          {user?.role === 'admin' ||
+          (user?.role === 'representative' && user?.nativePlaces?.length > 0) ? (
             <button
               onClick={handleAddFamily}
               className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
             >
               + Add Family
             </button>
-          )}
+          ) : null}
         </div>
       </div>
 
@@ -243,7 +196,6 @@ const FamilyList = ({ role }) => {
           <p className="text-center text-gray-500 py-4">No families found.</p>
         ) : (
           families.map((family) => {
-            const isExpanded = expandedFamilies.includes(family._id);
             const canEdit = hasPermission(family);
 
             return (
@@ -252,34 +204,29 @@ const FamilyList = ({ role }) => {
                 <div className="flex justify-between items-center mb-2">
                   <h3
                     onClick={() => toggleFamily(family._id)}
-                    className="font-bold text-lg text-gray-700 cursor-pointer select-none flex items-center space-x-4 relative group"
+                    className="font-bold text-lg text-gray-700 cursor-pointer flex items-center space-x-4"
                   >
-                    <div className="relative">
-                      <img
-                        src={
-                          family.image
-                            ? `${backend_url}${family.image}`
-                            : "/no_image.png"
-                        }
-                        alt=""
-                        className="w-12 h-12 rounded-full object-cover border border-gray-300"
-                      />
-                    </div>
-                    <div className="flex items-center space-x-2 text-gray-800">
-                      <span className="font-semibold text-gray-800">{family.headId}</span>
-                      <span className="text-gray-800">–</span>
-                      <span className="text-gray-900 font-semibold">{family.name}</span>
-                      <span className="text-gray-600">— {family.village}</span>
-                      <span className="ml-2 text-sm text-gray-500">
-                        [{isExpanded ? "Hide" : "Show"} Members]
-                      </span>
-                    </div>
+                    <img
+                      src={
+                        family.image
+                          ? family.image
+                          : "/no_image.png"
+                      }
+                      className="w-12 h-12 rounded-full object-cover border"
+                    />
+
+                    <span className="text-gray-800">{family.name}</span>
+                    <span className="text-gray-600">({family.village})</span>
+
+                    <span className="text-sm text-gray-500 ml-3">
+                      [{expandedFamilies.includes(family._id) ? "Hide" : "Show"} Members]
+                    </span>
                   </h3>
 
                   <div className="space-x-2">
                     <button
                       onClick={() => handleViewMember(family)}
-                      className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
+                      className="bg-blue-500 text-white px-2 py-1 rounded"
                     >
                       View
                     </button>
@@ -288,13 +235,14 @@ const FamilyList = ({ role }) => {
                       <>
                         <Link
                           to={`/dashboard/${role}/edit-family/${family._id}/head`}
-                          className="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600"
+                          className="bg-yellow-500 text-white px-2 py-1 rounded"
                         >
                           Edit
                         </Link>
+
                         <button
-                          onClick={() => handleDeleteFamily(family._id)}
-                          className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+                          onClick={() => deleteFamily(family._id, localStorage.getItem("token")).then(fetchFamilies)}
+                          className="bg-red-500 text-white px-2 py-1 rounded"
                         >
                           Delete
                         </button>
@@ -304,7 +252,7 @@ const FamilyList = ({ role }) => {
                 </div>
 
                 {/* Members Table */}
-                {isExpanded && (
+                {expandedFamilies.includes(family._id) && (
                   <table className="min-w-full border">
                     <thead>
                       <tr className="bg-gray-200 text-gray-700">
@@ -313,51 +261,58 @@ const FamilyList = ({ role }) => {
                         <th className="px-4 py-2">Name</th>
                         <th className="px-4 py-2">Relation</th>
                         <th className="px-4 py-2">Mobile</th>
-                        <th className="px-4 py-2">Actions</th>
+                        <th className="px-4 py-2">Action</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {family.members.map((member) => (
-                        <tr key={member._id} className="text-center border-t">
+                      {family.members.map((m) => (
+                        <tr key={m._id} className="text-center border-t">
                           <td className="px-4 py-2">
                             <img
-                              src={
-                                member.image
-                                  ? `${backend_url}${family.image}`
-                                  : "/no_image.png"
-                              }
-                              alt={member.name}
-                              className="w-12 h-12 rounded-full object-cover mx-auto border border-gray-300"
+                              src={m.image ? m.image : "/no_image.png"}
+                              className="w-12 h-12 rounded-full object-cover mx-auto border"
                             />
                           </td>
-                          <td className="px-4 py-2">{member.memberID}</td>
-                          <td className="px-4 py-2">{member.name}</td>
-                          <td className="px-4 py-2">{member.relation}</td>
-                          <td className="px-4 py-2">{member.mobile}</td>
-                          <td className="px-4 py-2 space-x-2">
+                          <td>{m.memberID}</td>
+                          <td>{m.name}</td>
+                          <td>{m.relation}</td>
+                          <td>{m.mobile}</td>
+
+                          <td className="space-x-2">
                             <button
-                              onClick={() => handleViewMember(member)}
-                              className="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600"
+                              onClick={() => handleViewMember(m)}
+                              className="bg-blue-500 text-white px-2 py-1 rounded"
                             >
                               View
                             </button>
+
                             {canEdit && (
                               <>
                                 <Link
-                                  to={`/dashboard/${role}/edit-family/${family._id}/${member._id}`}
-                                  className="bg-yellow-500 text-white px-2 py-1 rounded hover:bg-yellow-600"
+                                  to={`/dashboard/${role}/edit-family/${family._id}/${m._id}`}
+                                  className="bg-yellow-500 text-white px-2 py-1 rounded"
                                 >
                                   Edit
                                 </Link>
+
                                 <button
-                                  onClick={() => handleDeleteMember(family._id, member._id)}
-                                  className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+                                  onClick={() =>
+                                    deleteMember(family._id, m._id, localStorage.getItem("token")).then(
+                                      fetchFamilies
+                                    )
+                                  }
+                                  className="bg-red-500 text-white px-2 py-1 rounded"
                                 >
                                   Delete
                                 </button>
+
                                 <button
-                                  onClick={() => handleReassignHead(family._id, member._id)}
-                                  className="bg-purple-500 text-white px-2 py-1 rounded hover:bg-purple-600"
+                                  onClick={() =>
+                                    reassignHead(family._id, m._id, localStorage.getItem("token")).then(
+                                      fetchFamilies
+                                    )
+                                  }
+                                  className="bg-purple-500 text-white px-2 py-1 rounded"
                                 >
                                   Make Head
                                 </button>
@@ -379,73 +334,58 @@ const FamilyList = ({ role }) => {
       {totalPages > 1 && (
         <div className="flex justify-center items-center gap-3 mt-4">
           <button
-            onClick={() => handlePageChange(page - 1)}
+            className="px-3 py-1 bg-gray-200 rounded"
             disabled={page === 1}
-            className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+            onClick={() => handlePageChange(page - 1)}
           >
             Prev
           </button>
-          <span>
-            Page {page} of {totalPages}
-          </span>
+
+          <span>Page {page} of {totalPages}</span>
+
           <button
-            onClick={() => handlePageChange(page + 1)}
+            className="px-3 py-1 bg-gray-200 rounded"
             disabled={page === totalPages}
-            className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+            onClick={() => handlePageChange(page + 1)}
           >
             Next
           </button>
         </div>
       )}
 
-      {/* Popup Modal */}
+      {/* Member Modal */}
       {showModal && selectedMember && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
           <div className="bg-white rounded-lg shadow-lg w-11/12 md:w-2/3 lg:w-1/2 p-6 relative">
             <button
-              onClick={closeModal}
-              className="absolute top-3 right-3 text-gray-600 hover:text-black text-xl font-bold"
+              className="absolute top-3 right-3 text-gray-600 text-xl"
+              onClick={() => setShowModal(false)}
             >
               ×
             </button>
-            <h3 className="text-xl font-semibold mb-4 text-center border-b pb-2">
-              Member Details
-            </h3>
+
+            <h3 className="text-xl font-semibold mb-4 text-center border-b pb-2">Details</h3>
+
             <div className="flex justify-center mb-4">
               <img
                 src={
                   selectedMember.image
-                    ? `${backend_url}${family.image}`
+                    ? selectedMember.image
                     : "/no_image.png"
                 }
-                alt={selectedMember.name}
-                className="w-32 h-32 object-cover rounded-full border-4 border-gray-300 shadow-md"
+                className="w-32 h-32 rounded-full object-cover border-4 shadow-md"
               />
             </div>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div><strong>ID:</strong> {selectedMember.headId || selectedMember.memberID}</div>
+              <div><strong>ID:</strong> {selectedMember.memberID}</div>
               <div><strong>Name:</strong> {selectedMember.name}</div>
               <div><strong>Relation:</strong> {selectedMember.relation}</div>
               <div><strong>Gender:</strong> {selectedMember.gender}</div>
               <div><strong>Birth Date:</strong> {selectedMember.birthDate?.slice(0, 10)}</div>
-              <div><strong>Education:</strong> {selectedMember.education}</div>
-              <div><strong>Profession:</strong> {selectedMember.profession}</div>
-              <div><strong>Profession Type:</strong> {selectedMember.profession_type}</div>
-              <div><strong>Profession Address:</strong> {selectedMember.profession_address}</div>
-              <div><strong>Residence:</strong> {selectedMember.residence_address}</div>
-              <div><strong>Marital Status:</strong> {selectedMember.martial_status}</div>
-              <div><strong>Blood Group:</strong> {selectedMember.blood_group}</div>
               <div><strong>Mobile:</strong> {selectedMember.mobile}</div>
               <div><strong>Email:</strong> {selectedMember.email}</div>
-              <div className="col-span-2"><strong>Remarks:</strong> {selectedMember.remarks || 'N/A'}</div>
-            </div>
-            <div className="mt-5 flex justify-center">
-              <button
-                onClick={closeModal}
-                className="bg-gray-700 text-white px-4 py-2 rounded hover:bg-gray-800"
-              >
-                Close
-              </button>
+              <div className="col-span-2"><strong>Remarks:</strong> {selectedMember.remarks || "N/A"}</div>
             </div>
           </div>
         </div>
@@ -453,4 +393,5 @@ const FamilyList = ({ role }) => {
     </div>
   );
 };
+
 export default FamilyList;

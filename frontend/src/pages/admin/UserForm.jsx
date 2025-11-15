@@ -19,32 +19,23 @@ const UserForm = () => {
   const [villages, setVillages] = useState([]);
   const [headEmails, setHeadEmails] = useState([]);
 
-  // ✅ Fetch Village list & Head Email list
+  // Load villages & head emails
   useEffect(() => {
-    const fetchLists = async () => {
+    const loadLists = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const vRes = await api.get("/villages");
+        setVillages(vRes.data.data || []);
 
-        // Fetch villages
-        //const villageRes = await api.get("/villages", {
-        //  headers: { Authorization: `Bearer ${token}` },
-        //});
-         const res = await api.get('/villages');
-         setVillages(res.data.data);
-       // setVillages(villageRes.data.data || []);
-
-        // Fetch head emails
-        const headEmailRes = await api.get("/family/head-emails");
-        setHeadEmails(headEmailRes.data || []);
+        const hRes = await api.get("/family/head-emails");
+        setHeadEmails(hRes.data || []);
       } catch (err) {
-        console.error("Error fetching lists:", err);
+        console.error(err);
       }
     };
-
-    fetchLists();
+    loadLists();
   }, []);
 
-  // ✅ Load existing user (edit mode)
+  // Load user when editing
   useEffect(() => {
     if (isEdit) {
       const fetchUser = async () => {
@@ -52,45 +43,62 @@ const UserForm = () => {
           const res = await api.get(`/users/${id}`);
           setUser(res.data);
         } catch (err) {
-          console.error("Error fetching user:", err);
+          console.error("Error loading user:", err);
         }
       };
       fetchUser();
     }
   }, [id, isEdit]);
 
-  // ✅ Handle input change
+  // Handle general input change
   const handleChange = (e) => {
     const { name, value } = e.target;
+
+    // Clear dependent fields when role changes
+    if (name === "role") {
+      setUser((prev) => ({
+        ...prev,
+        role: value,
+        nativePlaces: value === "representative" ? prev.nativePlaces : [],
+        linkedEmails: value === "user" ? prev.linkedEmails : [],
+      }));
+      return;
+    }
+
     setUser((prev) => ({ ...prev, [name]: value }));
   };
 
-  // ✅ Handle multi-village select
+  // Multi-select villages
   const handleVillageChange = (e) => {
     const selected = Array.from(e.target.selectedOptions, (opt) => opt.value);
-    setUser((prev) => ({ ...prev, nativePlaces: selected }));
+    setUser((prev) => ({
+      ...prev,
+      nativePlaces: selected,
+    }));
   };
 
-  // ✅ Handle multi-email select
+  // Multi-select emails
   const handleEmailChange = (e) => {
     const selected = Array.from(e.target.selectedOptions, (opt) => opt.value);
-    setUser((prev) => ({ ...prev, linkedEmails: selected }));
+    setUser((prev) => ({
+      ...prev,
+      linkedEmails: selected,
+    }));
   };
 
-  // ✅ Submit form
+  // Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(user)
     try {
       if (isEdit) {
         await api.put(`/users/${id}`, user);
       } else {
         await api.post("/users", user);
       }
-      alert("User saved successfully!");
+      alert("User saved successfully");
       navigate("/dashboard/admin/user-list");
     } catch (err) {
-      console.error("Error saving user:", err);
+      console.error(err);
       alert("Failed to save user");
     }
   };
@@ -102,16 +110,16 @@ const UserForm = () => {
       </h2>
 
       <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
+
         {/* Name */}
         <div className="col-span-2">
           <label className="block text-sm font-medium mb-1">Name</label>
           <input
-            type="text"
             name="name"
             value={user.name}
             onChange={handleChange}
-            required
             className="border p-2 rounded w-full"
+            required
           />
         </div>
 
@@ -119,26 +127,26 @@ const UserForm = () => {
         <div className="col-span-2">
           <label className="block text-sm font-medium mb-1">Email</label>
           <input
-            type="email"
             name="email"
             value={user.email}
             onChange={handleChange}
-            required
+            type="email"
             className="border p-2 rounded w-full"
+            required
           />
         </div>
 
-        {/* Password (only on Add) */}
+        {/* Password (Only Add) */}
         {!isEdit && (
           <div className="col-span-2">
             <label className="block text-sm font-medium mb-1">Password</label>
             <input
-              type="password"
               name="password"
               value={user.password}
               onChange={handleChange}
-              required
+              type="password"
               className="border p-2 rounded w-full"
+              required
             />
           </div>
         )}
@@ -158,86 +166,72 @@ const UserForm = () => {
           </select>
         </div>
 
-       {user.role === "representative" && (
-  <>
-    {/* Multi-select Villages */}
-    <div className="col-span-2">
-      <label className="block text-sm font-medium mb-1">
-        Select Villages (multiple)
-      </label>
-      <select
-        multiple
-        value={user.nativePlaces}
-        onChange={(e) => {
-          const selected = Array.from(e.target.selectedOptions, (opt) => opt.value);
-          setUser((prev) => ({
-            ...prev,
-            nativePlaces: selected,
-            linkedEmails: selected.length > 0 ? [] : prev.linkedEmails, // clear emails if villages selected
-          }));
-        }}
-        disabled={user.linkedEmails.length > 0} // disable if emails chosen
-        className="border p-2 rounded w-full h-32 disabled:bg-gray-100"
-      >
-        {villages.map((v) => (
-          <option key={v._id} value={v.name}>
-            {v.name}
-          </option>
-        ))}
-      </select>
-      <p className="text-xs text-gray-500 mt-1">
-        Hold Ctrl (Windows) or Cmd (Mac) to select multiple.
-      </p>
-    </div>
+        {/* Representative → Villages */}
+        {user.role === "representative" && (
+          <div className="col-span-2">
+            <label className="block text-sm font-medium mb-1">
+              Assign Villages (Multiple)
+            </label>
+            <select
+              multiple
+              value={user.nativePlaces}
+              onChange={handleVillageChange}
+              className="border p-2 rounded w-full h-32"
+            >
+              {villages.map((v) => (
+                <option key={v._id} value={v.name}>
+                  {v.name}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-gray-500 mt-1">
+              Hold Ctrl (Windows) / Cmd (Mac) to select multiple.
+            </p>
+          </div>
+        )}
 
-    {/* Multi-select Head Emails */}
-    <div className="col-span-2">
-      <label className="block text-sm font-medium mb-1">
-        Linked Family Head Emails
-      </label>
-      <select
-        multiple
-        value={user.linkedEmails}
-        onChange={(e) => {
-          const selected = Array.from(e.target.selectedOptions, (opt) => opt.value);
-          setUser((prev) => ({
-            ...prev,
-            linkedEmails: selected,
-            nativePlaces: selected.length > 0 ? [] : prev.nativePlaces, // clear villages if emails selected
-          }));
-        }}
-        disabled={user.nativePlaces.length > 0} // disable if villages chosen
-        className="border p-2 rounded w-full h-32 disabled:bg-gray-100"
-      >
-        {headEmails.map((email) => (
-          <option key={email} value={email}>
-            {email}
-          </option>
-        ))}
-      </select>
-      <p className="text-xs text-gray-500 mt-1">
-        You can choose either villages OR head emails, not both.
-      </p>
-    </div>
-  </>
-)}
+        {/* User → Emails */}
+        {user.role === "user" && (
+          <div className="col-span-2">
+            <label className="block text-sm font-medium mb-1">
+              Link Head Emails (Multiple)
+            </label>
+            <select
+              multiple
+              value={user.linkedEmails}
+              onChange={handleEmailChange}
+              className="border p-2 rounded w-full h-32"
+            >
+              {headEmails.map((email) => (
+                <option key={email} value={email}>
+                  {email}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-gray-500 mt-1">
+              You can select multiple emails.
+            </p>
+          </div>
+        )}
 
         {/* Buttons */}
         <div className="col-span-2 flex justify-between mt-6">
           <button
             type="button"
-            onClick={() => navigate("/users")}
-            className="bg-gray-400 text-white py-2 px-4 rounded hover:bg-gray-500 transition"
+            className="bg-gray-400 text-white py-2 px-4 rounded"
+            onClick={() => navigate("/dashboard/admin/user-list")}
           >
             Close
           </button>
+
           <button
             type="submit"
-            className="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition"
+            className="bg-green-600 text-white py-2 px-4 rounded"
           >
             Save Changes
           </button>
         </div>
+
       </form>
     </div>
   );

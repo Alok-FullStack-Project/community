@@ -9,13 +9,14 @@ const Sidebar = ({ role, children }) => {
     { name: 'Advertise', path: '/dashboard/admin/advertise' }, // NEW
     { name: 'Events', path: '/dashboard/admin/events' }, // NEW
     { name: 'users', path: '/dashboard/admin/user-list' }, // NEW
+    { name: 'Go To Frontend', path: '/' },
   ];  
 
   const managerMenu = [
     { name: 'Family List', path: '/dashboard/representative/family-list' },
-    { name: 'Add Family', path: '/dashboard/representative/add-family' },
+     { name: 'Go To Frontend', path: '/' },
 
-  ];
+  ]; {/*{ name: 'Add Family', path: '/dashboard/representative/add-family' }, */}
 
   const menu = role === 'admin' ? adminMenu : managerMenu;
 

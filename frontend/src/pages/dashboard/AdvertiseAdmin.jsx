@@ -67,7 +67,7 @@ export default function AdvertiseAdmin() {
               <tr key={ad._id}>
                 <td className="border px-2 py-1">{ad.name}</td>
                 <td className="border px-2 py-1">
-                  {ad.image ? <img src={`${backend_url}${ad.image}`} alt={ad.name} className="h-12" /> : 'No Image'}
+                  {ad.image ? <img src={ad.image} alt={ad.name} className="h-12" /> : 'No Image'}
                 </td>
                 <td className="border px-2 py-1">{ad.startDate ? new Date(ad.startDate).toLocaleDateString() : '-'}</td>
                 <td className="border px-2 py-1">{ad.endDate ? new Date(ad.endDate).toLocaleDateString() : '-'}</td>
