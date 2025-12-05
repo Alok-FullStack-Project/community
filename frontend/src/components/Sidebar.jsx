@@ -8,6 +8,7 @@ const Sidebar = ({ role, children }) => {
     { name: 'Villages', path: '/dashboard/admin/villages' }, // NEW
     { name: 'Advertise', path: '/dashboard/admin/advertise' }, // NEW
     { name: 'Events', path: '/dashboard/admin/events' }, // NEW
+     { name: 'Categories', path: '/dashboard/admin/categories' }, // NEW
     { name: 'users', path: '/dashboard/admin/user-list' }, // NEW
     { name: 'Go To Frontend', path: '/' },
   ];  

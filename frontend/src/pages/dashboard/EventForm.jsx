@@ -7,16 +7,26 @@ const emptyEvent = {
   description: '',
   publish: true,
   coverImage: '',
+  category: 'event'   // default
 };
 
 export default function EventForm() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [event, setEvent] = useState(emptyEvent);
+  const [categories, setCategories] = useState([]);
 
   useEffect(() => {
-    if (id) fetchEvent();
+    if (id) 
+      {
+        fetchEvent();
+        fetchCategories();
+      }
   }, [id]);
+
+  useEffect(() => {
+        fetchCategories();
+  }, []);
 
   const fetchEvent = async () => {
     try {
@@ -27,6 +37,17 @@ export default function EventForm() {
       alert('Failed to fetch event');
     }
   };
+
+
+  const fetchCategories = async () => {
+  try {
+    const res = await api.get('/categories?type=event');
+    setCategories(res.data);
+  } catch (err) {
+    console.error(err);
+    alert("Failed to load categories");
+  }
+};
 
   const handleChange = (e) => {
     const { name, value, type, checked, files } = e.target;
@@ -43,6 +64,7 @@ export default function EventForm() {
       formData.append('name', event.name);
       formData.append('description', event.description);
       formData.append('publish', event.publish);
+      formData.append('category', event.category);
       if (event.file) formData.append('coverImage', event.file);
 
       if (id) {
@@ -64,6 +86,23 @@ export default function EventForm() {
     <div>
       <h2 className="text-2xl font-bold mb-4">{id ? 'Edit' : 'Add'} Event</h2>
       <form onSubmit={handleSubmit} encType="multipart/form-data" className="space-y-4 max-w-md">
+          <div>
+            <label>Category</label>
+            <select
+            name="category"
+            value={event.category}
+            onChange={handleChange}
+            required
+            className="w-full p-2 border rounded"
+            >
+            <option value="">Select Category</option>
+            {categories.map(cat => (
+            <option key={cat._id} value={cat._id}>
+            {cat.name} ({cat.type})
+            </option>
+            ))}
+            </select>
+          </div>
         <div>
           <label>Name</label>
           <input type="text" name="name" value={event.name} onChange={handleChange} required className="w-full p-2 border rounded" />

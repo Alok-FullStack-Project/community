@@ -10,6 +10,7 @@ const Advertise = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const backend_url = import.meta.env.VITE_URL ;
+  const [categories, setCategories] = useState([]);
 
   const fetchAds = async () => {
     try {
@@ -28,8 +29,15 @@ const Advertise = () => {
     }
   };
 
+  const fetchCategories = async () => {
+     api.get("/categories?type=advertise").then(res => {
+        setCategories(res.data);
+      });
+  }
+
   useEffect(() => {
     fetchAds();
+    fetchCategories();
   }, []);
 
   const getImageUrl = (imgPath) => {

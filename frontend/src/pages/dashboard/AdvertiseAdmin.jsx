@@ -54,12 +54,14 @@ export default function AdvertiseAdmin() {
         <table className="w-full border-collapse border">
           <thead>
             <tr className="bg-gray-200">
-              <th className="border px-2 py-1">Name</th>
-              <th className="border px-2 py-1">Image</th>
-              <th className="border px-2 py-1">Start Date</th>
-              <th className="border px-2 py-1">End Date</th>
-              <th className="border px-2 py-1">Published</th>
-              <th className="border px-2 py-1">Actions</th>
+              <th className="border px-2 py-1" align='left'>Name</th>
+              <th className="border px-2 py-1" align='left'>Image</th>
+              <th className="border px-2 py-1" align='left'>Start Date</th>
+              <th className="border px-2 py-1" align='left'>End Date</th>
+              <th className="border px-2 py-1" align='left'>Mobile</th>
+              <th className="border px-2 py-1" align='left'>Link</th>
+              <th className="border px-2 py-1" align='left'>Published</th>
+              <th className="border px-2 py-1" align='left'>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -71,6 +73,8 @@ export default function AdvertiseAdmin() {
                 </td>
                 <td className="border px-2 py-1">{ad.startDate ? new Date(ad.startDate).toLocaleDateString() : '-'}</td>
                 <td className="border px-2 py-1">{ad.endDate ? new Date(ad.endDate).toLocaleDateString() : '-'}</td>
+                <td className="border px-2 py-1">{ad.mobile}</td>
+                <td className="border px-2 py-1">{ad.link}</td>
                 <td className="border px-2 py-1">{ad.publish ? 'Yes' : 'No'}</td>
                 <td className="border px-2 py-1 flex gap-2">
                   <Link

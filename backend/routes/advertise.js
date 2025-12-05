@@ -8,6 +8,8 @@ const upload = require('../middleware/upload');
 // Create
 router.post('/', auth, upload.single('image'),advertiseController.createAdvertise);
 
+router.get('/active',  advertiseController.getActiveAdvertises);
+
 // List / search / paginate
 router.get('/',  advertiseController.listAdvertises);
 
@@ -19,5 +21,7 @@ router.put('/:id', auth, upload.single('image'),advertiseController.updateAdvert
 
 // Delete (soft by default, hard with ?hard=true)
 router.delete('/:id', auth, advertiseController.deleteAdvertise);
+
+
 
 module.exports = router;

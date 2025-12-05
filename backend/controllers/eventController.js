@@ -8,11 +8,13 @@ const imagekit = require("../utils/imagekit");
  */
 exports.createEvent = async (req, res) => {
   try {
-    const { name, description, publish, coverImage } = req.body;
+    const { name, description, publish, coverImage,category } = req.body;
 
     if (!name || !name.trim()) {
       return res.status(400).json({ message: 'Name is required' });
     }
+
+     if (!category) return res.status(400).json({ message: 'Category required' });
 
      let image = "";
         if (req.file) {
@@ -33,6 +35,7 @@ exports.createEvent = async (req, res) => {
       name: name.trim(),
       description: description || '',
       publish: publish !== undefined ? !!publish : true,
+      category,            // ADD CATEGORY
       coverImage: image || '',
       createdUser: req.user?._id,
     });
@@ -67,6 +70,7 @@ exports.listEvents = async (req, res) => {
 
     const total = await Event.countDocuments(filters);
     const data = await Event.find(filters)
+     .populate("category", "name type")
       .sort({ createdDate: -1 })
       .skip(skip)
       .limit(limitNum)
@@ -111,13 +115,14 @@ exports.getEvent = async (req, res) => {
  */
 exports.updateEvent = async (req, res) => {
   try {
-    const { name, description, publish, coverImage } = req.body;
+    const { name, description, publish, coverImage,category  } = req.body;
     const event = await Event.findById(req.params.id);
     if (!event) return res.status(404).json({ message: 'Event not found' });
 
     if (name !== undefined) event.name = String(name).trim();
     if (description !== undefined) event.description = description;
     if (publish !== undefined) event.publish = !!publish;
+     if (category !== undefined) event.category = category;   // ADD
     //if (coverImage !== undefined) event.coverImage = coverImage;
 
     if (req.file) {
@@ -175,15 +180,26 @@ exports.deleteEvent = async (req, res) => {
  */
 exports.addEventImage = async (req, res) => {
   try {
-    const { url, caption, publish } = req.body;
+    const { caption, publish } = req.body;
     const eventId = req.params.id;
 
     const event = await Event.findById(eventId);
     if (!event) return res.status(404).json({ message: 'Event not found' });
 
+     let image_url = "";
+        if (req.file) {
+          const uploadRes = await imagekit.upload({
+            file: req.file.buffer,
+            fileName: req.file.originalname,
+            folder: "/event",
+          });
+    
+          image_url = uploadRes.url;
+        }
+
     const image = new EventImage({
       eventId,
-      url,
+      url:image_url,
       caption: caption || '',
       publish: publish !== undefined ? !!publish : true,
       createdUser: req.user?._id,

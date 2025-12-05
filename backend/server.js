@@ -21,6 +21,7 @@ app.use('/api/villages', require('./routes/village'));
 app.use('/api/events', require('./routes/event'));
 app.use('/api/advertise', require('./routes/advertise'));
 app.use('/api/users', require('./routes/userRoutes'));
+app.use("/api/categories", require("./routes/categoryRoutes"));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server started on ${PORT}`));

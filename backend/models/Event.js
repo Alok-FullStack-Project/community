@@ -9,6 +9,13 @@ const EventSchema = new mongoose.Schema(
     // optional cover image url
     coverImage: { type: String },
 
+    // NEW FIELD
+    category: {
+         type: mongoose.Schema.Types.ObjectId,
+         ref: "Category",
+         required: true
+       },
+
     // audit
     createdUser: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
     modifiedUser: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },

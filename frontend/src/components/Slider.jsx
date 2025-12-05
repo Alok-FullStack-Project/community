@@ -26,7 +26,7 @@ const Slider = () => {
   };
 
   return (
-    <div className="relative w-full mx-auto mt-6 overflow-hidden rounded-2xl shadow-lg">
+    <div className="relative w-full mx-auto mt-1 overflow-hidden rounded-2xl shadow-lg">
       {/* 🖼️ Image */}
       <img
         src={images[currentIndex]}

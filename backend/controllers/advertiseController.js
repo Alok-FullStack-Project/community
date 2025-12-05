@@ -20,7 +20,7 @@ exports.createAdvertise = async (req, res) => {
     }
 
 
-    const { name, startDate, endDate, publish } = req.body;
+    const { name, startDate, endDate, publish,link,mobile  } = req.body; //,category
     //const image = req.file ? `/uploads/advertise/${req.file.filename}` : undefined;
 
     const advertise = new Advertise({
@@ -29,6 +29,9 @@ exports.createAdvertise = async (req, res) => {
       endDate,
       publish: publish === 'true',
       image,
+      link,
+      mobile,
+     // category,
       createdUser: req.user._id
     });
 
@@ -63,6 +66,7 @@ exports.listAdvertises = async (req, res) => {
 
     const total = await Advertise.countDocuments(filters);
     const data = await Advertise.find(filters)
+     // .populate("category", "name type")
       .sort({ createdDate: -1 })
       .skip(skip)
       .limit(limitNum)
@@ -90,6 +94,7 @@ exports.listAdvertises = async (req, res) => {
 exports.getAdvertise = async (req, res) => {
   try {
     const advertise = await Advertise.findById(req.params.id)
+      //.populate("category", "name type")
       .populate('createdUser', 'name email')
       .populate('modifiedUser', 'name email')
       .lean();
@@ -123,8 +128,11 @@ exports.updateAdvertise = async (req, res) => {
      advertise.image = uploadRes.url;
     }
 
-    const { name, startDate, endDate, publish } = req.body;
+    const { name, startDate, endDate, publish,link,mobile } = req.body; //,category
     if (name) advertise.name = name;
+    if (link) advertise.link = link;
+    if (mobile) advertise.mobile = mobile;
+   // if (category) advertise.category = category;
     if (startDate) advertise.startDate = startDate;
     if (endDate) advertise.endDate = endDate;
     if (publish !== undefined) advertise.publish = publish === 'true';
@@ -146,22 +154,44 @@ exports.updateAdvertise = async (req, res) => {
 exports.deleteAdvertise = async (req, res) => {
   try {
     const { id } = req.params;
-    const hard = req.query.hard === 'true';
+    //const hard = req.query.hard === 'true';
 
     const advert = await Advertise.findById(id);
     if (!advert) return res.status(404).json({ message: 'Advertise not found' });
 
-    if (hard) {
+    //if (hard) {
       await advert.deleteOne();
       return res.json({ message: 'Advertise permanently deleted' });
-    }
+    //}
 
-    advert.publish = false;
-    advert.modifiedUser = req.user?._id;
-    await advert.save();
-    res.json({ message: 'Advertise unpublished (soft delete)', advertise: advert });
+   // advert.publish = false;
+   // advert.modifiedUser = req.user?._id;
+   // await advert.save();
+    //res.json({ message: 'Advertise unpublished (soft delete)', advertise: advert });
   } catch (err) {
     console.error('deleteAdvertise error:', err);
     res.status(500).json({ message: 'Server error' });
+  }
+};
+
+exports.getActiveAdvertises = async (req, res) => {
+  try {
+    const today = new Date();
+
+    const activeAds = await Advertise.find({
+      publish: true,
+      endDate: { $gte: today }
+    })
+      .sort({ endDate: 1 }) // soon expiring first
+      .lean();
+
+    res.json({
+      count: activeAds.length,
+      data: activeAds
+    });
+
+  } catch (err) {
+    console.error("getActiveAdvertises error:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };

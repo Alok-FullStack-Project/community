@@ -33,6 +33,10 @@ import EventDetails from './pages/EventDetails';
 import UserList from './pages/admin/UserList';
 import UserForm from './pages/admin/UserForm';
 
+import CategoryList from "./pages/categories/CategoryList";
+import AddCategory from "./pages/categories/AddCategory";
+import EditCategory from "./pages/categories/EditCategory";
+
 
 
 function App() {
@@ -102,6 +106,13 @@ function App() {
             <Route path="events/add" element={<EventForm />} />
             <Route path="events/edit/:id" element={<EventForm />} />
             <Route path="events/images/:eventId" element={<EventImagesAdmin />} />
+
+            
+            <Route path="categories" element={<CategoryList />} />
+            <Route path="categories/add" element={<AddCategory />} />
+            <Route path="categories/edit/:id" element={<EditCategory />} />
+
+
       </Route>
 
       {/* Manager Dashboard */}
