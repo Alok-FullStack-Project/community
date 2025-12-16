@@ -3,7 +3,9 @@ const Category = require("../models/Category");
 // Create Category
 exports.createCategory = async (req, res) => {
   try {
-    const { name, type } = req.body;
+    const { name, type, description, order } = req.body;
+
+    console.log(req.body);
 
     const exists = await Category.findOne({ name });
     if (exists) return res.status(400).json({ message: "Category already exists" });
@@ -11,6 +13,8 @@ exports.createCategory = async (req, res) => {
     const cat = new Category({
       name,
       type,
+      description: description || "",
+      order: order || 0,
       createdUser: req.user._id
     });
 
@@ -22,7 +26,7 @@ exports.createCategory = async (req, res) => {
   }
 };
 
-// List Categories (filter by type)
+// List Categories (filter + sort by displayOrder > name)
 exports.listCategories = async (req, res) => {
   try {
     const { type } = req.query;
@@ -30,7 +34,10 @@ exports.listCategories = async (req, res) => {
     const filters = {};
     if (type) filters.type = type;
 
-    const categories = await Category.find(filters).sort({ name: 1 }).lean();
+    const categories = await Category.find(filters)
+      .sort({ displayOrder: 1, name: 1 })
+      .lean();
+
     res.json(categories);
   } catch (err) {
     console.error("listCategories error:", err);
@@ -38,7 +45,7 @@ exports.listCategories = async (req, res) => {
   }
 };
 
-// Get Category
+// Get Category by ID
 exports.getCategory = async (req, res) => {
   try {
     const cat = await Category.findById(req.params.id).lean();
@@ -53,13 +60,16 @@ exports.getCategory = async (req, res) => {
 // Update Category
 exports.updateCategory = async (req, res) => {
   try {
-    const { name, type } = req.body;
+    const { name, type, description, order } = req.body;
 
     const cat = await Category.findById(req.params.id);
     if (!cat) return res.status(404).json({ message: "Category not found" });
 
     if (name) cat.name = name;
     if (type) cat.type = type;
+    if (description !== undefined) cat.description = description;
+    if (order !== undefined) cat.order = order;
+
     cat.modifiedUser = req.user._id;
 
     await cat.save();

@@ -1,129 +1,337 @@
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import api from '../../api/api';
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import api from "../../api/api";
 
-const EventAdmin = () => {
+export default function EventAdmin() {
   const [events, setEvents] = useState([]);
+  const [categories, setCategories] = useState([]);
+
   const [loading, setLoading] = useState(false);
 
+  // Search & Filters
+  const [search, setSearch] = useState("");
+  const [filterCategory, setFilterCategory] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
+
+  // Sorting
+  const [sortField, setSortField] = useState("createdAt");
+  const [sortOrder, setSortOrder] = useState("desc");
+
+  // Pagination
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+
+  // Load categories
+  const fetchCategories = async () => {
+    try {
+      const res = await api.get("/categories?type=event");
+      setCategories(res.data);
+    } catch {}
+  };
+
+  // Load events
   const fetchEvents = async () => {
-    try {
-      setLoading(true);
-      const res = await api.get('/events');               // GET /api/events (with category populated)
-      const list = res.data.data || [];
+  try {
+    setLoading(true);
 
-      setEvents(list);
-    } catch (err) {
-      console.error(err);
-      alert('Failed to fetch events');
-    } finally {
-      setLoading(false);
+    const res = await api.get("/events");
+    const all = res.data.data || res.data || [];
+
+    // Apply search filter (frontend)
+    let filtered = all.filter((ev) =>
+      ev.name.toLowerCase().includes(search.toLowerCase())
+    );
+
+    // Filter category
+    if (filterCategory) {
+      filtered = filtered.filter(
+        (ev) => ev.category?._id === filterCategory
+      );
     }
-  };
 
-  const deleteEvent = async (id) => {
-    if (!window.confirm('Delete this event?')) return;
-    try {
-      await api.delete(`/events/${id}`);
-      setEvents(events.filter(e => e._id !== id));
-    } catch (err) {
-      console.error(err);
-      alert('Delete failed');
+    // Filter status
+    if (filterStatus !== "") {
+      filtered = filtered.filter(
+        (ev) => String(ev.publish) === filterStatus
+      );
     }
-  };
 
-  // Group by category.name
-  const groupByCategory = (events) => {
-    const map = {};
-    events.forEach((ev) => {
-      const catName = ev.category ? ev.category.name : "Uncategorized";
-      if (!map[catName]) map[catName] = [];
-      map[catName].push(ev);
-    });
-    return map;
-  };
+    // Sorting (frontend)
+    if (sortField === "name") {
+      filtered.sort((a, b) =>
+        sortOrder === "asc"
+          ? a.name.localeCompare(b.name)
+          : b.name.localeCompare(a.name)
+      );
+    }
 
-  const groupedEvents = groupByCategory(events);
+    if (sortField === "category") {
+      filtered.sort((a, b) =>
+        sortOrder === "asc"
+          ? (a.category?.name || "").localeCompare(b.category?.name || "")
+          : (b.category?.name || "").localeCompare(a.category?.name || "")
+      );
+    }
+
+    if (sortField === "createdAt") {
+      filtered.sort((a, b) =>
+        sortOrder === "asc"
+          ? new Date(a.createdAt) - new Date(b.createdAt)
+          : new Date(b.createdAt) - new Date(a.createdAt)
+      );
+    }
+
+    // Pagination (frontend)
+    const start = (page - 1) * limit;
+    const paginated = filtered.slice(start, start + limit);
+    setTotalPages(Math.ceil(filtered.length / limit));
+
+    setEvents(paginated);
+  } catch (err) {
+    console.error(err);
+    alert("Failed to load events");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   useEffect(() => {
     fetchEvents();
-  }, []);
+    fetchCategories();
+  }, [page, sortField, sortOrder]);
+
+  // Search Debounce
+  useEffect(() => {
+    const delay = setTimeout(() => fetchEvents(), 300);
+    return () => clearTimeout(delay);
+  }, [search, filterCategory, filterStatus]);
+
+  // Delete event
+  const deleteEvent = async (id) => {
+    if (!window.confirm("Delete this event?")) return;
+    try {
+      await api.delete(`/events/${id}`);
+      fetchEvents();
+    } catch {
+      alert("Delete failed");
+    }
+  };
+
+  // Toggle status
+  const togglePublish = async (event) => {
+    try {
+      await api.put(`/events/${event._id}/publish`, {
+        publish: !event.publish,
+      });
+      fetchEvents();
+    } catch {
+      alert("Unable to update status");
+    }
+  };
+
+  // Sorting Handler
+  const handleSort = (field) => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortOrder("asc");
+    }
+  };
 
   return (
-    <div>
-      <div className="flex justify-between mb-4">
-        <h2 className="text-2xl font-bold">Events</h2>
+    <div className="p-6 bg-white shadow rounded-xl">
+
+      {/* HEADER */}
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-3xl font-bold">Event Management</h2>
         <Link
           to="/dashboard/admin/events/add"
-          className="px-4 py-2 bg-blue-600 text-white rounded"
+          className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700"
         >
-          Add Event
+          + Add Event
         </Link>
       </div>
 
-      {loading ? (
-        <p>Loading...</p>
-      ) : events.length === 0 ? (
-        <p>No events found</p>
-      ) : (
-        Object.keys(groupedEvents).map((categoryName) => (
-          <div key={categoryName} className="mb-10">
-            <h3 className="text-xl font-semibold mb-3 border-b pb-1">
-              {categoryName}
-            </h3>
+      {/* SEARCH + FILTERS */}
+      <div className="grid md:grid-cols-4 gap-4 mb-6">
 
-            <div className="grid md:grid-cols-3 gap-4">
-              {groupedEvents[categoryName].map((event) => (
-                <div key={event._id} className="border p-4 rounded shadow-sm">
-                  {event.coverImage && (
-                    <img
-                      src={event.coverImage}
-                      alt={event.name}
-                      className="h-40 w-full object-cover mb-2 rounded"
-                    />
-                  )}
+        {/* Search */}
+        <input
+          type="text"
+          placeholder="Search by name..."
+          className="p-3 border rounded-lg"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
 
-                  <h3 className="text-lg font-bold">{event.name}</h3>
-                  <p className="text-sm text-gray-600">
-                    Category: {event.category?.name || "Uncategorized"}
-                  </p>
+        {/* Category Filter */}
+        <select
+          className="p-3 border rounded-lg"
+          value={filterCategory}
+          onChange={(e) => setFilterCategory(e.target.value)}
+        >
+          <option value="">All Categories</option>
+          {categories.map((c) => (
+            <option key={c._id} value={c._id}>
+              {c.name}
+            </option>
+          ))}
+        </select>
 
-                  <p className="mt-1">{event.description}</p>
+        {/* Status Filter */}
+        <select
+          className="p-3 border rounded-lg"
+          value={filterStatus}
+          onChange={(e) => setFilterStatus(e.target.value)}
+        >
+          <option value="">All Status</option>
+          <option value="true">Published</option>
+          <option value="false">Unpublished</option>
+        </select>
 
-                  <p className="text-sm mt-1">
-                    {event.publish ? "Published" : "Unpublished"}
-                  </p>
+        {/* Reset Button */}
+        <button
+          className="p-3 border rounded-lg hover:bg-gray-100"
+          onClick={() => {
+            setSearch("");
+            setFilterCategory("");
+            setFilterStatus("");
+            fetchEvents();
+          }}
+        >
+          Reset Filters
+        </button>
+      </div>
 
-                  <div className="flex space-x-2 mt-2">
+      {/* TABLE */}
+      <div className="overflow-x-auto">
+        <table className="min-w-full border text-sm">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="border px-3 py-2 cursor-pointer" onClick={() => handleSort("name")}>
+                Name {sortField === "name" && (sortOrder === "asc" ? "↑" : "↓")}
+              </th>
+              <th className="border px-3 py-2">Image</th>
+              <th className="border px-3 py-2 cursor-pointer" onClick={() => handleSort("category.name")}>
+                Category {sortField === "category.name" && (sortOrder === "asc" ? "↑" : "↓")}
+              </th>
+              <th className="border px-3 py-2 cursor-pointer" onClick={() => handleSort("createdAt")}>
+                Created {sortField === "createdAt" && (sortOrder === "asc" ? "↑" : "↓")}
+              </th>
+              <th className="border px-3 py-2">Status</th>
+              <th className="border px-3 py-2 text-center">Actions</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {loading ? (
+              <tr>
+                <td colSpan="6" className="text-center py-4">
+                  Loading...
+                </td>
+              </tr>
+            ) : events.length === 0 ? (
+              <tr>
+                <td colSpan="6" className="text-center py-4 text-gray-600">
+                  No events found.
+                </td>
+              </tr>
+            ) : (
+              events.map((event) => (
+                <tr key={event._id} className="hover:bg-gray-50">
+                  <td className="border px-3 py-2 font-medium">{event.name}</td>
+
+                  <td className="border px-3 py-2">
+                    {event.coverImage ? (
+                      <img
+                        src={event.coverImage}
+                        alt={event.name}
+                        className="h-12 w-20 object-cover rounded"
+                      />
+                    ) : (
+                      <span className="text-gray-400">No Image</span>
+                    )}
+                  </td>
+
+                  <td className="border px-3 py-2">
+                    {event.category?.name || "Uncategorized"}
+                  </td>
+
+                  <td className="border px-3 py-2">
+                    {new Date(event.createdAt).toLocaleDateString()}
+                  </td>
+
+                  {/* Status Toggle */}
+                  <td className="border px-3 py-2">
+                    <button
+                      onClick={() => togglePublish(event)}
+                      className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                        event.publish
+                          ? "bg-green-100 text-green-700"
+                          : "bg-red-100 text-red-700"
+                      }`}
+                    >
+                      {event.publish ? "Published" : "Unpublished"}
+                    </button>
+                  </td>
+
+                  {/* Action Buttons */}
+                  <td className="border px-3 py-2 space-x-3 text-center">
                     <Link
                       to={`/dashboard/admin/events/edit/${event._id}`}
-                      className="px-2 py-1 bg-green-500 text-white rounded"
+                      className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
                     >
-                      Edit
+                      ✏️ Edit
                     </Link>
 
                     <button
                       onClick={() => deleteEvent(event._id)}
-                      className="px-2 py-1 bg-red-500 text-white rounded"
+                      className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
                     >
-                      Delete
+                      🗑 Delete
                     </button>
 
                     <Link
                       to={`/dashboard/admin/events/images/${event._id}`}
-                      className="px-2 py-1 bg-blue-500 text-white rounded"
+                      className="px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700"
                     >
-                      Manage Images
+                      + Images
                     </Link>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        ))
-      )}
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* PAGINATION */}
+      <div className="flex justify-between items-center mt-6">
+        <span className="text-sm text-gray-600">
+          Page {page} of {totalPages}
+        </span>
+
+        <div className="flex gap-2">
+          <button
+            disabled={page === 1}
+            onClick={() => setPage((p) => p - 1)}
+            className="px-3 py-1 border rounded disabled:opacity-50"
+          >
+            Prev
+          </button>
+
+          <button
+            disabled={page === totalPages}
+            onClick={() => setPage((p) => p + 1)}
+            className="px-3 py-1 border rounded disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
+      </div>
     </div>
   );
-};
-
-export default EventAdmin;
+}

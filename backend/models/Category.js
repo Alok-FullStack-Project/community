@@ -15,6 +15,17 @@ const CategorySchema = new mongoose.Schema(
       enum: ["advertise", "event"],
     },
 
+    description: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    order: {
+      type: Number,
+      default: 0,
+    },
+
     createdUser: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

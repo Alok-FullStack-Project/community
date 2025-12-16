@@ -7,6 +7,17 @@ const EventImageSchema = new mongoose.Schema(
     caption: { type: String, default: '' },
     publish: { type: Boolean, default: true },
 
+    // 🆕 Display controls
+    showInSlider: {
+      type: Boolean,
+      default: false   // Home page slider
+    },
+
+    showInGallery: {
+      type: Boolean,
+      default: true    // Event gallery
+    },
+
     // audit
     createdUser: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     modifiedUser: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },

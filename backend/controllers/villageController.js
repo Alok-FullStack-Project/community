@@ -43,8 +43,8 @@ exports.listVillages = async (req, res) => {
       const assignedVillages = user.nativePlaces || [];
        let villages = [];
       villages = await Village.find({
-        name : { $in: user.nativePlaces }
-      });
+        
+      }); //name : { $in: user.nativePlaces }
      
       return res.json({
         total: villages.length,

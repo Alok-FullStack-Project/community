@@ -22,6 +22,45 @@ router.get("/",  auth,familyController.listFamilies); //auth,
 
 router.get('/head-emails', auth, familyController.headEmails);
 
+// --- COUNT FAMILIES ---
+router.get("/count", auth, async (req, res) => {
+  try {
+    const Family = require("../models/Family");
+     const FamilyMember = require("../models/FamilyMember");
+    const familyCount = await Family.countDocuments();
+    const memberCount = await FamilyMember.countDocuments();
+    res.status(200).json({ familyCount,memberCount });
+  } catch (err) {
+    console.log("❌ Count Error:", err.message);
+    res.status(500).json({
+      message: "Failed to count families",
+      error: err.message
+    });
+  }
+});
+
+router.get("/family_memeber_count", auth, async (req, res) => {
+  try {
+    const Family = require("../models/Family");
+    const count = await Family.countDocuments();
+    res.status(200).json({ count });
+  } catch (err) {
+    console.log("❌ Count Error:", err.message);
+    res.status(500).json({
+      message: "Failed to count families",
+      error: err.message
+    });
+  }
+});
+
+// 1️⃣ Gender statistics
+router.get("/stats/gender", auth, familyController.genderStats);
+
+// 2️⃣ Village-wise family count
+router.get("/stats/village", auth, familyController.villageStats);
+
+// 3️⃣ Marital status + Age groups
+router.get("/stats/marital-age", auth, familyController.maritalAgeStats);
 // 🔍 Get family by ID (includes members)
 router.get("/:id", auth, familyController.getFamily);
 
@@ -59,7 +98,7 @@ router.delete(
 );
 
 router.get('/member/:memberId', auth, familyController.getMember);
-router.put('/member/:memberId', auth, familyController.updateMember);
+router.put('/member/:memberId', auth,upload.single("image"), familyController.updateMember);
 
 
 module.exports = router;

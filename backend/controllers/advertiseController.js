@@ -20,7 +20,7 @@ exports.createAdvertise = async (req, res) => {
     }
 
 
-    const { name, startDate, endDate, publish,link,mobile  } = req.body; //,category
+    const { name, startDate, endDate, publish,link,mobile,priority,description,order  } = req.body; //,category
     //const image = req.file ? `/uploads/advertise/${req.file.filename}` : undefined;
 
     const advertise = new Advertise({
@@ -28,9 +28,12 @@ exports.createAdvertise = async (req, res) => {
       startDate,
       endDate,
       publish: publish === 'true',
+      priority,
       image,
       link,
       mobile,
+      description,
+      order,
      // category,
       createdUser: req.user._id
     });
@@ -128,7 +131,7 @@ exports.updateAdvertise = async (req, res) => {
      advertise.image = uploadRes.url;
     }
 
-    const { name, startDate, endDate, publish,link,mobile } = req.body; //,category
+    const { name, startDate, endDate, publish,link,mobile,priority,description,order  } = req.body; //,category
     if (name) advertise.name = name;
     if (link) advertise.link = link;
     if (mobile) advertise.mobile = mobile;
@@ -136,6 +139,9 @@ exports.updateAdvertise = async (req, res) => {
     if (startDate) advertise.startDate = startDate;
     if (endDate) advertise.endDate = endDate;
     if (publish !== undefined) advertise.publish = publish === 'true';
+    if (priority) advertise.priority = priority;
+    if (description) advertise.description = description;
+    if (order) advertise.order = order;
    //if (req.file) advertise.image = `/uploads/advertise/${req.file.filename}`;
     advertise.modifiedUser = req.user._id;
 

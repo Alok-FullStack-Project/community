@@ -38,6 +38,7 @@ const FamilyList = ({ role }) => {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
+  const [familyCount, setFamilycount] = useState(1);
 
   const navigate = useNavigate();
 
@@ -63,7 +64,7 @@ const FamilyList = ({ role }) => {
       });
 
       setFamilies(data.data);
-      setTotalPages(data.totalPages);
+      setTotalPages(data.total);
     } catch (err) {
       console.error(err);
       alert('Failed to load families');
@@ -86,9 +87,25 @@ const FamilyList = ({ role }) => {
     }
   };
 
+  const fetchFamilyCount = async () => {
+    try {
+        const token = localStorage.getItem('token');
+      const res = await axios.get(`${API_BASE}/count`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setFamilycount(res.data.familyCount);
+    } catch (err) {
+      console.error(err);
+      alert('Failed to load.');
+    }
+  };
+
+
+
   useEffect(() => {
     fetchFamilies();
     fetchVillages();
+    fetchFamilyCount();
   }, [page, selectedVillage]);
 
   // --- Debounced search ---
@@ -145,7 +162,7 @@ const FamilyList = ({ role }) => {
     <div>
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-3">
-        <h2 className="text-xl font-semibold">Family List</h2>
+        <h2 className="text-xl font-semibold">Family List ({familyCount})</h2>
 
         <div className="flex flex-wrap gap-3">
           {/* Village Filter */}
@@ -203,32 +220,29 @@ const FamilyList = ({ role }) => {
                 {/* Family Header */}
                 <div className="flex justify-between items-center mb-2">
                   <h3
-                    onClick={() => toggleFamily(family._id)}
-                    className="font-bold text-lg text-gray-700 cursor-pointer flex items-center space-x-4"
-                  >
-                    <img
-                      src={
-                        family.image
-                          ? family.image
-                          : "/no_image.png"
-                      }
-                      className="w-12 h-12 rounded-full object-cover border"
-                    />
+  onClick={() => toggleFamily(family._id)}
+  className="font-bold text-lg text-gray-700 cursor-pointer flex items-center space-x-4"
+>
+  <img
+    src={family.image ? family.image : "/no_image.png"}
+    className="w-12 h-12 rounded-full object-cover border"
+  />
 
-                    <span className="text-gray-800">{family.name}</span>
-                    <span className="text-gray-600">({family.village})</span>
+  <span className="text-gray-800">{family.name}</span>
+  <span className="text-gray-600">({family.village})</span>
 
-                    <span className="text-sm text-gray-500 ml-3">
-                      [{expandedFamilies.includes(family._id) ? "Hide" : "Show"} Members]
-                    </span>
-                  </h3>
+ 
+  <span className="text-sm text-gray-500 ml-3">
+    [{expandedFamilies.includes(family._id) ? "Hide" : "Show"} Members ({family.members?.length || 0})]
+  </span>
+</h3>
 
                   <div className="space-x-2">
                     <button
                       onClick={() => handleViewMember(family)}
                       className="bg-blue-500 text-white px-2 py-1 rounded"
                     >
-                      View
+                     🔍 View
                     </button>
 
                     {canEdit && (
@@ -237,18 +251,19 @@ const FamilyList = ({ role }) => {
                           to={`/dashboard/${role}/edit-family/${family._id}/head`}
                           className="bg-yellow-500 text-white px-2 py-1 rounded"
                         >
-                          Edit
+                          ✏️ Edit
                         </Link>
 
                         <button
                           onClick={() => deleteFamily(family._id, localStorage.getItem("token")).then(fetchFamilies)}
                           className="bg-red-500 text-white px-2 py-1 rounded"
                         >
-                          Delete
+                          🗑️ Delete
                         </button>
                       </>
                     )}
                   </div>
+                  
                 </div>
 
                 {/* Members Table */}
@@ -283,7 +298,7 @@ const FamilyList = ({ role }) => {
                               onClick={() => handleViewMember(m)}
                               className="bg-blue-500 text-white px-2 py-1 rounded"
                             >
-                              View
+                              🔍 View
                             </button>
 
                             {canEdit && (
@@ -292,7 +307,7 @@ const FamilyList = ({ role }) => {
                                   to={`/dashboard/${role}/edit-family/${family._id}/${m._id}`}
                                   className="bg-yellow-500 text-white px-2 py-1 rounded"
                                 >
-                                  Edit
+                                  ✏️ Edit
                                 </Link>
 
                                 <button
@@ -303,7 +318,7 @@ const FamilyList = ({ role }) => {
                                   }
                                   className="bg-red-500 text-white px-2 py-1 rounded"
                                 >
-                                  Delete
+                                  🗑️ Delete
                                 </button>
 
                                 <button
@@ -314,7 +329,7 @@ const FamilyList = ({ role }) => {
                                   }
                                   className="bg-purple-500 text-white px-2 py-1 rounded"
                                 >
-                                  Make Head
+                                  👨‍👩‍👧 Make Head
                                 </button>
                               </>
                             )}

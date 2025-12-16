@@ -2,11 +2,8 @@ import React, { useEffect, useState } from "react";
 import Slider from "../components/Slider";
 import api from "../api/api";
 import { Link } from "react-router-dom";
-import { format } from "date-fns";
-
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay, Pagination } from "swiper/modules";
-
 import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
@@ -53,81 +50,107 @@ const Home = () => {
     <>
       <Slider />
 
-      <section className="px-6 py-10 bg-gray-50 min-h-screen w-full">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 max-w-[1600px] mx-auto">
+      <section className="px-4 sm:px-6 py-10 bg-gradient-to-br from-slate-50 via-white to-indigo-50 min-h-screen w-full">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 max-w-7xl mx-auto">
 
-          {/* EVENTS VERTICAL SLIDER - 3 SHOW AT A TIME */}
-          <div className="md:col-span-3 bg-white rounded-2xl shadow p-4">
-            <h2 className="text-xl font-bold mb-4 text-center">Upcoming Events</h2>
+          {/* EVENTS VERTICAL SLIDER */}
+          <div className="md:col-span-3 bg-white rounded-2xl shadow-lg p-5 border border-slate-100">
+            <h2 className="text-xl font-semibold mb-4 text-center text-slate-800">
+              Events
+            </h2>
 
             {loadingEvents ? (
-              <p className="text-gray-500 text-center">Loading events...</p>
-            ) : events.length === 0 ? (
-              <p className="text-gray-500 text-center">No events available.</p>
+  <p className="text-gray-500 text-center">Loading events...</p>
+) : events.length === 0 ? (
+  <p className="text-gray-500 text-center">No events available.</p>
+) : (
+  <div className="relative">
+
+  {/* Swiper */}
+  <Swiper
+    modules={[Navigation, Autoplay, Pagination]}
+    autoplay={{ delay: 1800, disableOnInteraction: false }}
+    loop={true}
+    navigation
+    pagination={false}
+    spaceBetween={15}
+    className="md:h-[650px] relative"
+    breakpoints={{
+      0: { direction: "horizontal", slidesPerView: 1 },
+      640: { direction: "vertical", slidesPerView: 3 },
+    }}
+  >
+    {events.map((event) => (
+      <SwiperSlide key={event._id}>
+        <div className="mb-4 pb-4 border-b border-slate-200">
+          <div className="rounded-xl overflow-hidden mb-3">
+            {event.coverImage ? (
+              <img
+                src={event.coverImage}
+                alt={event.name}
+                className="h-32 w-full object-cover"
+              />
             ) : (
-              <Swiper
-                modules={[Navigation, Autoplay, Pagination]}
-                direction="vertical"
-                autoplay={{ delay: 1800, disableOnInteraction: false }}
-                navigation
-                pagination={{ clickable: true }}
-                loop={true}
-                slidesPerView={3}
-                spaceBetween={15}
-                className="h-[650px]"
-              >
-                {events.map((event) => (
-                  <SwiperSlide key={event._id}>
-                    <div className="mb-4 pb-3 border-b border-gray-100">
-
-                      {event.coverImage ? (
-                        <img
-                          src={event.coverImage}
-                          alt={event.name}
-                          className="h-32 w-full object-cover rounded-md mb-2"
-                        />
-                      ) : (
-                        <div className="h-32 bg-gray-200 flex items-center justify-center text-gray-400 mb-2">
-                          No Image
-                        </div>
-                      )}
-
-                      <h3 className="font-semibold text-sm">{event.name}</h3>
-
-                      <p className="text-xs text-gray-600 mb-1">
-                        {event.description?.slice(0, 60)}
-                        {event.description?.length > 60 && "..."}
-                      </p>
-
-                      <Link
-                        to={`/events/${event._id}`}
-                        className="text-sky-600 text-xs hover:underline"
-                      >
-                        View →
-                      </Link>
-                    </div>
-                  </SwiperSlide>
-                ))}
-              </Swiper>
+              <div className="h-32 bg-slate-200 flex items-center justify-center text-gray-400">
+                No Image
+              </div>
             )}
           </div>
 
-          {/* ABOUT SECTION */}
-          <div className="md:col-span-6 bg-white rounded-2xl shadow p-10 text-center">
-            <h2 className="text-3xl font-bold mb-6 text-blue-700">Welcome to Our Community</h2>
-            <p className="text-gray-700 mb-4 text-lg">
-              Our community is built on shared values and cultural heritage.
-            </p>
-            <p className="text-gray-700 text-lg">
-               We are a connected family of members helping each other grow and stay
-              in touch. Join us and explore the beautiful stories, events, and
-              heritage.
-            </p>
+          <h3 className="font-semibold text-sm text-slate-800">{event.name}</h3>
+          <p className="text-xs text-gray-600 mt-1 mb-2">
+            {event.description?.slice(0, 60)}
+            {event.description?.length > 60 && "..."}
+          </p>
+
+          <Link
+            to={`/events/${event._id}`}
+            className="text-indigo-600 text-xs hover:underline font-medium"
+          >
+            View →
+          </Link>
+        </div>
+      </SwiperSlide>
+    ))}
+  </Swiper>
+
+  
+</div>
+
+)}
+
           </div>
 
-          {/* ADS VERTICAL SLIDER - 3 SHOW AT A TIME */}
-          <div className="md:col-span-3 bg-white rounded-2xl shadow p-4">
-            <h2 className="text-xl font-bold mb-4 text-center">Advertisements</h2>
+          {/* ABOUT SECTION */}
+          <div className="md:col-span-6 bg-white rounded-3xl shadow-xl p-10 border border-slate-100 text-center">
+            <h2 className="text-4xl font-extrabold mb-6 text-indigo-700 drop-shadow-sm">
+              Welcome to Our Community
+            </h2>
+
+            <p className="text-slate-700 mb-4 text-lg leading-relaxed">
+              Our community is built on shared values and cultural heritage.
+            </p>
+
+            <p className="text-slate-700 text-lg leading-relaxed">
+              We are a connected family of members helping each other grow and stay
+              in touch. Join us to explore stories, events, and rich cultural heritage.
+            </p>
+
+            <div className="mt-8">
+              <Link
+                to="/community"
+                className="inline-block px-6 py-3 bg-indigo-600 text-white rounded-xl shadow-md hover:bg-indigo-700 transition"
+              >
+                Explore Communities
+              </Link>
+            </div>
+          </div>
+
+          {/* ADS VERTICAL SLIDER */}
+          <div className="md:col-span-3 bg-white rounded-2xl shadow-lg p-5 border border-slate-100">
+            <h2 className="text-xl font-semibold mb-4 text-center text-slate-800">
+              Advertisements
+            </h2>
 
             {loadingAds ? (
               <p className="text-gray-500 text-center">Loading ads...</p>
@@ -136,59 +159,44 @@ const Home = () => {
             ) : (
               <Swiper
                 modules={[Navigation, Autoplay, Pagination]}
-                direction="vertical"
                 autoplay={{ delay: 1900, disableOnInteraction: false }}
                 navigation
-                pagination={{ clickable: true }}
+                pagination={false}
                 loop={true}
-                slidesPerView={3}
                 spaceBetween={15}
-                className="h-[650px]"
+                className="md:h-[650px]"
+                breakpoints={{
+                  0: {
+                    direction: "horizontal",
+                    slidesPerView: 1,
+                  },
+                  640: {
+                    direction: "vertical",
+                    slidesPerView: 3,
+                  },
+                }}
               >
                 {ads.map((ad) => (
                   <SwiperSlide key={ad._id}>
-                    <div className="mb-4 pb-3 border-b border-gray-100">
-                      {ad.image ? (
-                       <Link to={ad.link} target="_blank" rel="noopener noreferrer">
+                    <div className="mb-4 pb-4 border-b border-slate-200">
+                      <Link
+                        to={ad.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block rounded-xl overflow-hidden"
+                      >
+                        {ad.image ? (
                           <img
                             src={ad.image}
                             alt={ad.name}
-                            className="h-32 w-full object-cover rounded-md mb-2 cursor-pointer"
+                            className="h-32 w-full object-cover"
                           />
-                        </Link>
-                      ) : (
-                        <div className="h-32 bg-gray-200 flex items-center justify-center text-gray-400 mb-2">
-                          No Image
-                        </div>
-                      )}
-
-                     {/* <h3 className="font-semibold text-sm">{ad.name}</h3>
-
-                      <p className="text-xs text-gray-600 mb-1">
-                        {ad.description?.slice(0, 60)}
-                        {ad.description?.length > 60 && "..."}
-                      </p>
-
-                      <div className="text-xs text-gray-500 mb-2">
-                        {ad.startDate && (
-                          <span>{format(new Date(ad.startDate), "dd MMM yyyy")}</span>
+                        ) : (
+                          <div className="h-32 bg-slate-200 flex items-center justify-center text-gray-400">
+                            No Image
+                          </div>
                         )}
-                        {ad.endDate && " → "}
-                        {ad.endDate && (
-                          <span>{format(new Date(ad.endDate), "dd MMM yyyy")}</span>
-                        )}
-                      </div> 
-
-                      {ad.link && (
-                        <a
-                          href={ad.link}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-sky-600 text-xs hover:underline"
-                        >
-                          Visit →
-                        </a>
-                      )}*/}
+                      </Link>
                     </div>
                   </SwiperSlide>
                 ))}

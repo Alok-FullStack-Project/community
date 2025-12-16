@@ -180,38 +180,61 @@ exports.deleteEvent = async (req, res) => {
  */
 exports.addEventImage = async (req, res) => {
   try {
-    const { caption, publish } = req.body;
+    const {
+      caption,
+      publish,
+      showInSlider,
+      showInGallery
+    } = req.body;
+
     const eventId = req.params.id;
 
+    // 🔍 Check event exists
     const event = await Event.findById(eventId);
-    if (!event) return res.status(404).json({ message: 'Event not found' });
+    if (!event) {
+      return res.status(404).json({ message: "Event not found" });
+    }
 
-     let image_url = "";
-        if (req.file) {
-          const uploadRes = await imagekit.upload({
-            file: req.file.buffer,
-            fileName: req.file.originalname,
-            folder: "/event",
-          });
-    
-          image_url = uploadRes.url;
-        }
+    /* ================= IMAGE UPLOAD ================= */
+    let image_url = "";
 
+    if (req.file) {
+      const uploadRes = await imagekit.upload({
+        file: req.file.buffer,
+        fileName: req.file.originalname,
+        folder: "/event",
+      });
+
+      image_url = uploadRes.url;
+    }
+
+    /* ================= SAVE IMAGE ================= */
     const image = new EventImage({
       eventId,
-      url:image_url,
-      caption: caption || '',
-      publish: publish !== undefined ? !!publish : true,
+      url: image_url,
+      caption: caption || "",
+      publish: publish !== undefined ? publish === "true" : true,
+
+      // ⭐ NEW FLAGS
+      showInSlider: showInSlider === "true",
+      showInGallery: showInGallery !== "false", // default true
+
       createdUser: req.user?._id,
     });
 
     await image.save();
+
     res.status(201).json(image);
+
   } catch (err) {
-    console.error('addEventImage error:', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error("addEventImage error:", err);
+    res.status(500).json({
+      message: "Failed to upload event image",
+      error: err.message,
+    });
   }
 };
+
 
 /**
  * List Event images
@@ -230,6 +253,23 @@ exports.listEventImages = async (req, res) => {
     res.status(500).json({ message: 'Server error' });
   }
 };
+
+exports.listEventImagesGallery = async (req, res) => {
+  try {
+    const eventId = req.params.id;
+    const images = await EventImage.find({ eventId,publish: true,
+      showInGallery: true })
+      .sort({ createdDate: -1 })
+      .populate('createdUser', 'name email')
+      .populate('modifiedUser', 'name email');
+    res.json(images);
+  } catch (err) {
+    console.error('listEventImages error:', err);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+
 
 /**
  * Update Event Image
@@ -272,5 +312,20 @@ exports.deleteEventImage = async (req, res) => {
   } catch (err) {
     console.error('deleteEventImage error:', err);
     res.status(500).json({ message: 'Server error' });
+  }
+};
+
+exports.getSliderImages = async (req, res) => {
+  try {
+    const images = await EventImage.find({
+      publish: true,
+      showInSlider: true
+    })
+    .sort({ createdDate: -1 })
+    .select("url caption");
+
+    res.json(images);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to load slider images" });
   }
 };

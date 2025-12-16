@@ -9,6 +9,20 @@ const AdvertiseSchema = new mongoose.Schema(
     startDate: { type: Date },
     endDate: { type: Date },
     publish: { type: Boolean, default: true },
+    description: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+    order: {
+      type: Number,
+      default: 0,
+    },
+    priority: {
+      type: String,
+      enum: ["premium", "standard"],
+      default: "standard",
+    }, 
   /*  category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",

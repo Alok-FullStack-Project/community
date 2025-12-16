@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import api from '../../api/api';
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import api from "../../api/api";
 
 const emptyEvent = {
-  name: '',
-  description: '',
+  name: "",
+  description: "",
   publish: true,
-  coverImage: '',
-  category: 'event'   // default
+  coverImage: "",
+  category: "", // must be _id
 };
 
 export default function EventForm() {
@@ -15,8 +15,12 @@ export default function EventForm() {
   const navigate = useNavigate();
   const [event, setEvent] = useState(emptyEvent);
   const [categories, setCategories] = useState([]);
+  const isEdit = Boolean(id);
 
-  useEffect(() => {
+  // ------------------------------
+  // Fetch Categories
+  // ------------------------------
+   useEffect(() => {
     if (id) 
       {
         fetchEvent();
@@ -49,46 +53,74 @@ export default function EventForm() {
   }
 };
 
+
+
+  // ------------------------------
+  // Handle Input Change
+  // ------------------------------
   const handleChange = (e) => {
     const { name, value, type, checked, files } = e.target;
-    setEvent(prev => ({
+    setEvent((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : type === 'file' ? files[0] : value
+      [name]:
+        type === "checkbox"
+          ? checked
+          : type === "file"
+          ? files[0]
+          : value,
     }));
   };
 
+  // ------------------------------
+  // Submit Form
+  // ------------------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      const formData = new FormData();
-      formData.append('name', event.name);
-      formData.append('description', event.description);
-      formData.append('publish', event.publish);
-      formData.append('category', event.category);
-      if (event.file) formData.append('coverImage', event.file);
 
-      if (id) {
-        await api.put(`/events/${id}`, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
-        alert('Event updated');
+    try {
+      const fd = new FormData();
+      fd.append("name", event.name);
+      fd.append("description", event.description);
+      fd.append("publish", event.publish);
+      fd.append("category", event.category);
+
+      if (event.file) fd.append("coverImage", event.file);
+
+      if (isEdit) {
+        await api.put(`/events/${id}`, fd, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        alert("Event updated!");
       } else {
-        console.log(formData);
-        await api.post('/events', formData, { headers: { 'Content-Type': 'multipart/form-data' } });
-        alert('Event added');
+        await api.post(`/events`, fd, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+        alert("Event created!");
       }
-      navigate('/dashboard/admin/events');
+
+      navigate("/dashboard/admin/events");
     } catch (err) {
       console.error(err);
-      alert('Save failed');
+      alert("Save failed");
     }
   };
 
+  // ------------------------------
+  // UI
+  // ------------------------------
   return (
-    <div>
-      <h2 className="text-2xl font-bold mb-4">{id ? 'Edit' : 'Add'} Event</h2>
-      <form onSubmit={handleSubmit} encType="multipart/form-data" className="space-y-4 max-w-md">
-          <div>
-            <label>Category</label>
-            <select
+    <div className="p-6 bg-white rounded-xl shadow-md max-w-xl mx-auto">
+
+      <h2 className="text-2xl font-bold mb-6">
+        {isEdit ? "Edit Event" : "Add Event"}
+      </h2>
+
+      <form className="space-y-5" onSubmit={handleSubmit}>
+
+        {/* CATEGORY */}
+        <div>
+          <label className="block font-medium mb-1">Category</label>
+          <select
             name="category"
             value={event.category}
             onChange={handleChange}
@@ -102,26 +134,84 @@ export default function EventForm() {
             </option>
             ))}
             </select>
-          </div>
-        <div>
-          <label>Name</label>
-          <input type="text" name="name" value={event.name} onChange={handleChange} required className="w-full p-2 border rounded" />
         </div>
+
+        {/* EVENT NAME */}
         <div>
-          <label>Description</label>
-          <textarea name="description" value={event.description} onChange={handleChange} className="w-full p-2 border rounded" />
+          <label className="block font-medium mb-1">Event Name</label>
+          <input
+            type="text"
+            name="name"
+            value={event.name}
+            onChange={handleChange}
+            placeholder="Enter event name"
+            className="w-full border p-3 rounded"
+            required
+          />
         </div>
+
+        {/* DESCRIPTION */}
         <div>
-          <label>Publish</label>
-          <input type="checkbox" name="publish" checked={event.publish} onChange={handleChange} className="ml-2" />
+          <label className="block font-medium mb-1">Description</label>
+          <textarea
+            name="description"
+            value={event.description}
+            onChange={handleChange}
+            placeholder="Write event description..."
+            className="w-full border p-3 rounded"
+            rows="4"
+          ></textarea>
         </div>
+
+        {/* PUBLISH */}
+        <div className="flex items-center gap-3">
+          <input
+            type="checkbox"
+            name="publish"
+            checked={event.publish}
+            onChange={handleChange}
+          />
+          <label className="font-medium">Publish</label>
+        </div>
+
+        {/* IMAGE UPLOAD */}
         <div>
-          <label>Cover Image</label>
+          <label className="block font-medium mb-1">Cover Image</label>
           <input type="file" name="file" onChange={handleChange} />
-          {event.coverImage && !event.file && <img src={event.coverImage} alt="preview" className="h-40 mt-2" />}
-          {event.file && <img src={URL.createObjectURL(event.file)} alt="preview" className="h-40 mt-2" />}
+
+          {/* Preview */}
+          {event.file ? (
+            <img
+              src={URL.createObjectURL(event.file)}
+              alt="preview"
+              className="h-40 mt-3 rounded shadow"
+            />
+          ) : event.coverImage ? (
+            <img
+              src={event.coverImage}
+              alt="preview"
+              className="h-40 mt-3 rounded shadow"
+            />
+          ) : null}
         </div>
-        <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded">Save</button>
+
+        {/* BUTTONS */}
+        <div className="flex justify-between pt-3">
+          <button
+            type="button"
+            onClick={() => navigate("/dashboard/admin/events")}
+            className="px-4 py-2 bg-gray-400 text-white rounded"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="submit"
+            className="px-5 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          >
+            Save Event
+          </button>
+        </div>
       </form>
     </div>
   );

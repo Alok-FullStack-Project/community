@@ -206,7 +206,7 @@ exports.listFamilies = async (req, res) => {
     // Step 4️⃣: Query Family collection
     const families = await Family.find(filter)
       .populate("members")
-      .sort({ createdAt: -1 })
+      .sort({ createdDate: -1 })
       .skip((page - 1) * limit)
       .limit(limit);
 
@@ -322,7 +322,7 @@ exports.getFamily = async (req, res) => {
 
 // ✏️ Update Family (head or basic info)
 exports.updateFamily = async (req, res) => {
-  try {
+ /* try {
     const updated = await Family.findByIdAndUpdate(
       req.params.id,
       { ...req.body, modifiedUser: req.user._id },
@@ -334,7 +334,41 @@ exports.updateFamily = async (req, res) => {
   } catch (error) {
     console.error("Error updating family:", error);
     res.status(500).json({ message: "Server error" });
+  }*/
+
+  try {
+  //  const { memberId } = req.params; // memberId from URL
+    const updateData = req.body;
+
+    // Validate if member exists
+    const family = await Family.findById( req.params.id,);
+    if (!family) {
+      return res.status(404).json({ message: 'Family not found' });
+    }
+
+    // Update all editable fields dynamically
+    Object.keys(updateData).forEach((key) => {
+      family[key] = updateData[key];
+     // console.log( family[key],'-------------',updateData[key]);
+    });
+
+    // Save updated record
+    const updatedMember = await family.save();
+
+    res.status(200).json({
+      message: 'Family updated successfully',
+      data: updatedMember,
+    });
+  } catch (error) {
+    console.error('Error updating Family:', error);
+    res.status(500).json({ message: 'Server error while updating Family' });
   }
+
+
+
+
+
+
 };
 
 // ❌ Delete Family (cascade deletes members)
@@ -434,7 +468,9 @@ exports.updateMember = async (req, res) => {
     const { memberId } = req.params; // memberId from URL
     const updateData = req.body;
 
-    console.log("id" + memberId);
+        console.log("Req body : " , updateData);
+
+
 
     // Validate if member exists
     const member = await FamilyMember.findById(memberId);
@@ -442,9 +478,13 @@ exports.updateMember = async (req, res) => {
       return res.status(404).json({ message: 'Member not found' });
     }
 
+
+
     // Update all editable fields dynamically
     Object.keys(updateData).forEach((key) => {
       member[key] = updateData[key];
+
+      console.log(member[key]);
     });
 
     // Save updated record
@@ -479,5 +519,129 @@ exports.updateMember = async (req, res) => {
   } catch (err) {
     console.error("Error fetching head emails:", err);
     res.status(500).json({ message: "Error fetching head emails" });
+  }
+};
+
+exports.genderStats = async (req, res) => {
+  try {
+    const stats = await Family.aggregate([
+      {
+        $lookup: {
+          from: "familymembers",
+          localField: "members",
+          foreignField: "_id",
+          as: "membersData"
+        }
+      },
+      { $unwind: "$membersData" },
+      {
+        $group: {
+          _id: "$membersData.gender",
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
+    let male = 0, female = 0, other = 0;
+
+    stats.forEach(s => {
+      if (s._id === "Male") male = s.count;
+      else if (s._id === "Female") female = s.count;
+      else other = s.count;
+    });
+
+    res.json({ male, female, other });
+
+  } catch (err) {
+    res.status(500).json({
+      message: "Failed to get gender stats",
+      error: err.message
+    });
+  }
+};
+
+
+exports.villageStats = async (req, res) => {
+  try {
+    const Family = require("../models/Family");
+
+    const data = await Family.aggregate([
+      {
+        $group: {
+          _id: "$village",
+          users: { $sum: 1 }
+        }
+      },
+      { $sort: { _id: 1 } }
+    ]);
+
+    res.json(
+      data.map(item => ({
+        village: item._id || "Unknown",
+        users: item.users
+      }))
+    );
+  } catch (err) {
+    res.status(500).json({
+      message: "Failed to get village stats",
+      error: err.message
+    });
+  }
+};
+
+exports.maritalAgeStats = async (req, res) => {
+  try {
+    const Family = require("../models/Family");
+
+    // MUST POPULATE MEMBERS
+    const families = await Family.find({})
+      .select("members")
+      .populate("members"); // <-- VERY IMPORTANT
+
+    // Age buckets
+    const groups = {
+      "0-18": { married: 0, unmarried: 0 },
+      "19-30": { married: 0, unmarried: 0 },
+      "31-45": { married: 0, unmarried: 0 },
+      "46-60": { married: 0, unmarried: 0 },
+      "60+": { married: 0, unmarried: 0 }
+    };
+
+    const getAge = (dob) => {
+      if (!dob) return 0;
+      const birth = new Date(dob);
+      const diff = Date.now() - birth.getTime();
+      return Math.abs(new Date(diff).getUTCFullYear() - 1970);
+    };
+
+    families.forEach(family => {
+      family.members.forEach(member => {
+        const age = getAge(member.birthDate);
+        const isMarried = member.marital_status === "Married";
+
+        let bucket = "";
+        if (age <= 18) bucket = "0-18";
+        else if (age <= 30) bucket = "19-30";
+        else if (age <= 45) bucket = "31-45";
+        else if (age <= 60) bucket = "46-60";
+        else bucket = "60+";
+
+        groups[bucket][isMarried ? "married" : "unmarried"]++;
+      });
+    });
+
+    const result = Object.keys(groups).map(key => ({
+      group: key,
+      married: groups[key].married,
+      unmarried: groups[key].unmarried
+    }));
+
+    res.status(200).json(result);
+
+  } catch (err) {
+    res.status(500).json({
+      message: "Failed to calculate marital+age stats",
+      error: err.message
+    });
   }
 };

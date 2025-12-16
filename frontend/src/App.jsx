@@ -5,6 +5,8 @@ import AuthLayout from './layouts/AuthLayout';
 import PublicLayout from './layouts/PublicLayout';
 import AdminLayout from './layouts/AdminLayout';
 import ManagerLayout from './layouts/ManagerLayout';
+import UserLayout from './layouts/UserLayout';
+
 import ProtectedRoute from './components/ProtectedRoute';
 
 import Home from './pages/Home';
@@ -18,7 +20,6 @@ import Community from './pages/Community';
 
 import FamilyList from './pages/dashboard/FamilyList';
 import AddFamily from './pages/dashboard/AddFamily';
-import EditFamily from './pages/dashboard/EditFamily';
 import FamilyDetail from './pages/dashboard/FamilyDetail';
 import VillageAdmin from './pages/dashboard/VillageAdmin';
 import AdvertiseAdmin from './pages/dashboard/AdvertiseAdmin';
@@ -32,12 +33,9 @@ import FamilyEdit from "./pages/dashboard/FamilyEdit";
 import EventDetails from './pages/EventDetails';
 import UserList from './pages/admin/UserList';
 import UserForm from './pages/admin/UserForm';
+import AdminDashboard from './pages/admin/AdminDashboard';
 
 import CategoryList from "./pages/categories/CategoryList";
-import AddCategory from "./pages/categories/AddCategory";
-import EditCategory from "./pages/categories/EditCategory";
-
-
 
 function App() {
   return (
@@ -77,6 +75,8 @@ function App() {
           </ProtectedRoute>
         }
       >
+        <Route index element={<AdminDashboard />} />
+
         <Route path="family-list" element={<FamilyList role="admin" />} />
         <Route path="add-family" element={<AddFamily />} />
         <Route path="edit-family/:familyId/:memberId" element={<FamilyEdit />} />
@@ -109,8 +109,7 @@ function App() {
 
             
             <Route path="categories" element={<CategoryList />} />
-            <Route path="categories/add" element={<AddCategory />} />
-            <Route path="categories/edit/:id" element={<EditCategory />} />
+
 
 
       </Route>
@@ -134,7 +133,7 @@ function App() {
         path="/dashboard/user"
         element={
           <ProtectedRoute roles={['user']}>
-            <ManagerLayout />
+            <UserLayout />
           </ProtectedRoute>
         }
       >
