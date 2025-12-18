@@ -275,25 +275,55 @@ exports.listEventImagesGallery = async (req, res) => {
  * Update Event Image
  * PUT /api/event/image/:imageId
  */
+
 exports.updateEventImage = async (req, res) => {
   try {
     const { imageId } = req.params;
-    const { url, caption, publish } = req.body;
+    const { caption, publish, showInSlider, showInGallery } = req.body;
 
     const image = await EventImage.findById(imageId);
-    if (!image) return res.status(404).json({ message: 'Image not found' });
+    if (!image) {
+      return res.status(404).json({ message: "Image not found" });
+    }
 
-    if (url !== undefined) image.url = url;
+    /* ================= IMAGE REPLACE ================= */
+    if (req.file) {
+      const uploadRes = await imagekit.upload({
+        file: req.file.buffer,
+        fileName: req.file.originalname,
+        folder: "/event",
+      });
+
+      image.url = uploadRes.url;
+    }
+
+    /* ================= UPDATE FIELDS ================= */
     if (caption !== undefined) image.caption = caption;
-    if (publish !== undefined) image.publish = !!publish;
+    if (publish !== undefined) image.publish = publish === "true" || publish === true;
+
+    if (showInSlider !== undefined) {
+      image.showInSlider = showInSlider === "true" || showInSlider === true;
+    }
+
+    if (showInGallery !== undefined) {
+      image.showInGallery = showInGallery === "true" || showInGallery === true;
+    }
 
     image.modifiedUser = req.user?._id;
+
     await image.save();
 
-    res.json(image);
+    res.json({
+      message: "Image updated successfully",
+      image,
+    });
+
   } catch (err) {
-    console.error('updateEventImage error:', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error("updateEventImage error:", err);
+    res.status(500).json({
+      message: "Server error",
+      error: err.message,
+    });
   }
 };
 

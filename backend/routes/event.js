@@ -15,7 +15,7 @@ router.delete('/:id', auth, eventController.deleteEvent);
 router.post('/:id/image', auth, upload.single('url'), eventController.addEventImage);
 router.get('/:id/images',  eventController.listEventImages); //auth,
 router.get('/:id/images/gallery',  eventController.listEventImagesGallery); //auth,
-router.put('/image/:imageId', auth, eventController.updateEventImage);
+router.put('/image/:imageId', auth, upload.single('url'),eventController.updateEventImage);
 router.delete('/image/:imageId', auth, eventController.deleteEventImage);
 router.get('/event-images/slider',  eventController.getSliderImages); //auth,
 
