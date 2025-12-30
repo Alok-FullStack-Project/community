@@ -79,6 +79,7 @@ export default function Community() {
 
         const res = await api.get("/family", { params });
         const payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
+		setTotalCount(res.data.total)
         setFamilies(payload);
         setTotalPages(res.data?.total && res.data?.limit ? Math.ceil(res.data.total / res.data.limit) : 1);
       } catch (err) {
@@ -92,21 +93,8 @@ export default function Community() {
 
   useEffect(() => {
     fetchVillages();
-    fetchFamilyCount();
     fetchFamilies({ pageNumber: page });
   }, [fetchVillages, fetchFamilies, page]);
-
-  const fetchFamilyCount = async () => {
-    try {
-        const token = localStorage.getItem('token');
-      const res = await api.get('family/count');
-     // setFamilycount(res.data.familyCount);
-      setTotalCount(res.data.familyCount + res.data.memberCount)
-    } catch (err) {
-      console.error(err);
-      alert('Failed to load.');
-    }
-  };
 
   const onSearchClick = () => {
     setPage(1);
@@ -201,7 +189,7 @@ export default function Community() {
         <div className="flex items-center justify-between mb-8">
             <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
                 <Users className="text-blue-600" size={24} />
-                {loading ? "Refreshing..." : `Registered Families (${totalCount})`}
+                {loading ? "Refreshing..." : `Registered Families (${families.length})`}
             </h2>
         </div>
 

@@ -95,7 +95,7 @@ exports.createFamily = async (req, res) => {
             const uploadRes = await imagekit.upload({
               file: req.file.buffer,
               fileName: req.file.originalname,
-              folder: "/advertise",
+              folder: "/family",
             });
       
             image = uploadRes.url;
@@ -219,6 +219,8 @@ exports.listFamilies = async (req, res) => {
   }
 };
 
+
+
 /*exports.listFamilies = async (req, res) => {
   try {
     let { page = 1, limit = 20, q, village } = req.query;
@@ -297,6 +299,31 @@ exports.listFamilies = async (req, res) => {
 }; */
 
 
+exports.familiesByVillage = async (req, res) => {
+  try {
+    let {  village } = req.query;
+   
+    const filter = {};
+
+    // ✅ Filter by village if provided
+    if (village) filter.village = village;
+
+    // Step 4️⃣: Query Family collection
+    const families = await Family.find(filter)
+      .populate("members")
+      .sort({ createdDate: -1 })
+      .lean();
+
+   
+
+    res.json({  data: families });
+  } catch (error) {
+    console.error("Error listing families:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
 // 🔍 Get Family by ID
 exports.getFamily = async (req, res) => {
   try {
@@ -344,6 +371,18 @@ exports.updateFamily = async (req, res) => {
     const family = await Family.findById( req.params.id,);
     if (!family) {
       return res.status(404).json({ message: 'Family not found' });
+    }
+
+    let image = "";
+    if (req.file) {
+      const uploadRes = await imagekit.upload({
+        file: req.file.buffer,
+        fileName: req.file.originalname,
+        folder: "/family",
+      });
+
+      image = uploadRes.url;
+      family.image = image;
     }
 
     // Update all editable fields dynamically
@@ -476,6 +515,18 @@ exports.updateMember = async (req, res) => {
     const member = await FamilyMember.findById(memberId);
     if (!member) {
       return res.status(404).json({ message: 'Member not found' });
+    }
+
+    let image = "";
+    if (req.file) {
+      const uploadRes = await imagekit.upload({
+        file: req.file.buffer,
+        fileName: req.file.originalname,
+        folder: "/family",
+      });
+
+      image = uploadRes.url;
+      member.image = image;
     }
 
 

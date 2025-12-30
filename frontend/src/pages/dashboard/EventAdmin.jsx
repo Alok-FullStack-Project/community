@@ -167,20 +167,7 @@ export default function EventAdmin() {
           onChange={(e) => setSearch(e.target.value)}
         />
 
-        {/* Category Filter */}
-        <select
-          className="p-3 border rounded-lg"
-          value={filterCategory}
-          onChange={(e) => setFilterCategory(e.target.value)}
-        >
-          <option value="">All Categories</option>
-          {categories.map((c) => (
-            <option key={c._id} value={c._id}>
-              {c.name}
-            </option>
-          ))}
-        </select>
-
+       
         {/* Status Filter */}
         <select
           className="p-3 border rounded-lg"
@@ -214,10 +201,13 @@ export default function EventAdmin() {
               <th className="border px-3 py-2 cursor-pointer" onClick={() => handleSort("name")}>
                 Name {sortField === "name" && (sortOrder === "asc" ? "↑" : "↓")}
               </th>
-              <th className="border px-3 py-2">Image</th>
-              <th className="border px-3 py-2 cursor-pointer" onClick={() => handleSort("category.name")}>
-                Category {sortField === "category.name" && (sortOrder === "asc" ? "↑" : "↓")}
+			   <th className="border px-3 py-2 cursor-pointer" onClick={() => handleSort("event_date")}>
+                Date {sortField === "event_date" && (sortOrder === "asc" ? "↑" : "↓")}
               </th>
+			   <th className="border px-3 py-2 cursor-pointer" onClick={() => handleSort("place")}>
+                Place {sortField === "place" && (sortOrder === "asc" ? "↑" : "↓")}
+              </th>
+              <th className="border px-3 py-2">Image</th>
               <th className="border px-3 py-2 cursor-pointer" onClick={() => handleSort("createdAt")}>
                 Created {sortField === "createdAt" && (sortOrder === "asc" ? "↑" : "↓")}
               </th>
@@ -243,6 +233,14 @@ export default function EventAdmin() {
               events.map((event) => (
                 <tr key={event._id} className="hover:bg-gray-50">
                   <td className="border px-3 py-2 font-medium">{event.name}</td>
+				   <td className="border px-3 py-2 font-medium">{event.event_date
+    ? new Date(event.event_date).toLocaleDateString("en-IN", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      })
+    : "—"}</td>
+				    <td className="border px-3 py-2 font-medium">{event.place}</td>
 
                   <td className="border px-3 py-2">
                     {event.coverImage ? (
@@ -254,10 +252,6 @@ export default function EventAdmin() {
                     ) : (
                       <span className="text-gray-400">No Image</span>
                     )}
-                  </td>
-
-                  <td className="border px-3 py-2">
-                    {event.category?.name || "Uncategorized"}
                   </td>
 
                   <td className="border px-3 py-2">

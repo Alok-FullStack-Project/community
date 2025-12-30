@@ -123,6 +123,12 @@ export default function FamilyEdit() {
   };
 
   const prev = () => setStep((s) => Math.max(1, s - 1));
+  
+  const getFamilyListRoute = () => {
+  if (role === "admin") return "/dashboard/admin/family-list";
+  if (role === "representative") return "/dashboard/representative/family-list";
+  return "/";
+};
 
   // --------------------------------
   // SUBMIT
@@ -154,10 +160,7 @@ export default function FamilyEdit() {
         await axios.put(`${API_BASE}/member/${memberId}`, fd, { headers });
          alert("Member updated successfully");
       }
-      if(role === 'admin')
-        navigate("/dashboard/admin/family-list");
-      else if(role === 'representative')
-        navigate("/dashboard/representative/family-list");
+       navigate(getFamilyListRoute());
     } catch (err) {
       console.error(err);
       alert("Failed to update member");
@@ -165,6 +168,12 @@ export default function FamilyEdit() {
       setLoading(false);
     }
   };
+  
+  const handleCancel =() => {
+	     navigate(getFamilyListRoute());
+  }
+  
+  
 
   if (!member) return <div className="p-6 text-center">Loading...</div>;
 
@@ -486,7 +495,15 @@ export default function FamilyEdit() {
       {/* -------------------------------- */}
       {/* BUTTONS */}
       {/* -------------------------------- */}
-      <div className="flex justify-between mt-6">
+      <div className="flex justify-end mt-6">
+	   <div className="flex gap-3">
+		<button
+            className="px-6 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+            onClick= {handleCancel}
+          >
+           Cancel
+        </button>
+  
         {step > 1 ? (
           <button
             className="px-4 py-2 border rounded hover:bg-slate-50"
@@ -497,7 +514,7 @@ export default function FamilyEdit() {
         ) : (
           <span></span>
         )}
-
+		
         {step < 4 ? (
           <button
             className="px-6 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
@@ -513,7 +530,9 @@ export default function FamilyEdit() {
           >
             {loading ? "Saving..." : "Save Changes"}
           </button>
-        )}
+        )
+		}
+		 </div>
       </div>
     </div>
   );

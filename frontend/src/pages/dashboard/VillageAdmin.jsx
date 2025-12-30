@@ -14,12 +14,20 @@ export default function VillageAdmin() {
   const [search, setSearch] = useState("");
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
 
   const fetchVillages = async () => {
     try {
       setLoading(true);
-      const res = await api.get("/villages");
-      setVillages(res.data.data || []);
+      const res = await api.get("/villages",{
+        params: {
+          q: search,
+          page,
+          limit: rowsPerPage,
+        },
+      });
+       setVillages(res.data.data || []);
+      setTotalPages(res.data.totalPages || 1);
     } catch (err) {
       toast.error("Failed to load villages");
     } finally {
@@ -27,9 +35,10 @@ export default function VillageAdmin() {
     }
   };
 
-  useEffect(() => {
+useEffect(() => {
     fetchVillages();
-  }, []);
+  }, [page, rowsPerPage, search]);
+
 
   // Create or Update
   const handleSubmit = async (e) => {
@@ -76,13 +85,13 @@ export default function VillageAdmin() {
   };
 
   // Apply search filter
-  const filtered = villages.filter((v) =>
-    v.name.toLowerCase().includes(search.toLowerCase())
-  );
+  //const filtered = villages.filter((v) =>
+  //  v.name.toLowerCase().includes(search.toLowerCase())
+  //);
 
   // Pagination logic
-  const totalPages = Math.ceil(filtered.length / rowsPerPage);
-  const pageData = filtered.slice((page - 1) * rowsPerPage, page * rowsPerPage);
+  //const totalPages = Math.ceil(filtered.length / rowsPerPage);
+  //const pageData = filtered.slice((page - 1) * rowsPerPage, page * rowsPerPage);
 
   return (
     <div className="p-6 max-w-6xl mx-auto">
@@ -181,14 +190,14 @@ export default function VillageAdmin() {
                   Loading...
                 </td>
               </tr>
-            ) : pageData.length === 0 ? (
+            ) : villages.length === 0 ? (
               <tr>
                 <td colSpan="4" className="text-center py-6 text-gray-400">
                   No villages found
                 </td>
               </tr>
             ) : (
-              pageData.map((v) => (
+              villages.map((v) => (
                 <tr key={v._id} className="border-t hover:bg-indigo-50 transition">
                   <td className="px-4 py-3 font-medium">{v.name}</td>
 

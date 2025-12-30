@@ -43,8 +43,8 @@ exports.listVillages = async (req, res) => {
       const assignedVillages = user.nativePlaces || [];
        let villages = [];
       villages = await Village.find({
-        
-      }); //name : { $in: user.nativePlaces }
+        name : { $in: user.nativePlaces }
+      }); 
      
       return res.json({
         total: villages.length,
@@ -91,6 +91,57 @@ exports.listVillages = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+/**
+ * get all villages 
+ * GET /api/villages/all
+ */
+exports.getAllVillages = async (req, res) => {
+  try {
+    const user = req.user; // logged-in user from auth middleware
+
+    // ----------------------------------------
+    // 1️⃣ REPRESENTATIVE → return assigned villages ONLY
+    // ----------------------------------------
+    if (user?.role === "representative") {
+      const assignedVillages = user.nativePlaces || [];
+       let villages = [];
+      villages = await Village.find({
+        name : { $in: user.nativePlaces }
+      }); 
+     
+      return res.json({
+        total: villages.length,
+        page: 1,
+        limit: villages.length,
+        totalPages: 1,
+        data: villages,
+      });
+    }
+
+    // ----------------------------------------
+    // 2️⃣ ADMIN / MANAGER → normal flow (search, pagination)
+    // ----------------------------------------
+
+    const villages = await Village.find({publish:true})
+      .sort({ name : -1 })
+      .lean();
+
+    res.json({
+        total: villages.length,
+        page: 1,
+        limit: villages.length,
+        totalPages: 1,
+        data: villages,
+    });
+  } catch (err) {
+    console.error("listVillages error:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
+
 
 
 /**
@@ -145,6 +196,8 @@ exports.deleteVillage = async (req, res) => {
   try {
     const { id } = req.params;
     const hard = req.query.hard === 'true';
+    
+   //const hard = true;
 
     const village = await Village.findById(id);
     if (!village) return res.status(404).json({ message: 'Village not found' });

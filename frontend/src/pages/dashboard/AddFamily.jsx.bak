@@ -66,7 +66,7 @@ export default function AddFamilyWizard() {
   // when selectedVillage changes and mode is member -> load families
   useEffect(() => {
     if (mode === "member" && selectedVillage) {
-      api.get(`/family/families-by-village?village=${encodeURIComponent(selectedVillage)}`)
+      api.get(`/family?village=${encodeURIComponent(selectedVillage)}`)
         .then((res) => setFamilies(res.data.data || []))
         .catch((err) => {
           console.error("fetch families failed", err);
@@ -244,11 +244,11 @@ export default function AddFamilyWizard() {
   // small helper: progress percent
   const progressPercent = Math.round(((step - 1) / 4) * 100);
   
-	const getFamilyListRoute = () => {
-	  if (role === "admin") return "/dashboard/admin/family-list";
-	  if (role === "representative") return "/dashboard/representative/family-list";
-	  return "/";
-	};
+   const getFamilyListRoute = () => {
+  if (role === "admin") return "/dashboard/admin/family-list";
+  if (role === "representative") return "/dashboard/representative/family-list";
+  return "/";
+};
 
    const handleCancel =() => {
 	     navigate(getFamilyListRoute());

@@ -20,10 +20,14 @@ router.post(
 // 📋 Get all families (with pagination, search, village filter)
 router.get("/",  auth,familyController.listFamilies); //auth,
 
+router.get("/families-by-village",  auth,familyController.familiesByVillage); //auth,
+
+
+
 router.get('/head-emails', auth, familyController.headEmails);
 
 // --- COUNT FAMILIES ---
-router.get("/count", auth, async (req, res) => {
+router.get("/count",  async (req, res) => {
   try {
     const Family = require("../models/Family");
      const FamilyMember = require("../models/FamilyMember");
@@ -37,7 +41,7 @@ router.get("/count", auth, async (req, res) => {
       error: err.message
     });
   }
-});
+}); //auth,
 
 router.get("/family_memeber_count", auth, async (req, res) => {
   try {

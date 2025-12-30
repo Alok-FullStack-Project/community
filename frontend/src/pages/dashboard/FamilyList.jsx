@@ -5,7 +5,7 @@ import { Link, useNavigate } from 'react-router-dom';
 
 const backend_url = import.meta.env.VITE_URL;
 const API_BASE = import.meta.env.VITE_API_URL + '/family';
-const VILLAGE_API = import.meta.env.VITE_API_URL + '/villages';
+const VILLAGE_API = import.meta.env.VITE_API_URL + '/villages/all';
 
 // --- API Helpers ---
 const deleteFamily = async (familyId, token) => {
@@ -64,7 +64,7 @@ const FamilyList = ({ role }) => {
       });
 
       setFamilies(data.data);
-      setTotalPages(data.total);
+      setTotalPages(Math.ceil(data.total / 20));
     } catch (err) {
       console.error(err);
       alert('Failed to load families');
@@ -255,7 +255,10 @@ const FamilyList = ({ role }) => {
                         </Link>
 
                         <button
-                          onClick={() => deleteFamily(family._id, localStorage.getItem("token")).then(fetchFamilies)}
+                          onClick={() => {
+							  if (window.confirm("Are you sure you want to delete this Family?")) {
+							   deleteFamily(family._id, localStorage.getItem("token")).then(fetchFamilies)
+						  }}}
                           className="bg-red-500 text-white px-2 py-1 rounded"
                         >
                           🗑️ Delete
@@ -310,16 +313,20 @@ const FamilyList = ({ role }) => {
                                   ✏️ Edit
                                 </Link>
 
-                                <button
-                                  onClick={() =>
-                                    deleteMember(family._id, m._id, localStorage.getItem("token")).then(
-                                      fetchFamilies
-                                    )
-                                  }
-                                  className="bg-red-500 text-white px-2 py-1 rounded"
-                                >
-                                  🗑️ Delete
-                                </button>
+                               <button
+								  onClick={() => {
+									if (window.confirm("Are you sure you want to delete this member?")) {
+									  deleteMember(
+										family._id,
+										m._id,
+										localStorage.getItem("token")
+									  ).then(fetchFamilies);
+									}
+								  }}
+								  className="bg-red-500 text-white px-2 py-1 rounded hover:bg-red-600"
+								>
+								  🗑️ Delete
+								</button>
 
                                 <button
                                   onClick={() =>

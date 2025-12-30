@@ -10,6 +10,9 @@ router.post('/', auth, villageController.createVillage);
 // List / search / paginate
 router.get('/',  auth,villageController.listVillages); //auth,
 
+// get all villages
+router.get('/all',  auth,villageController.getAllVillages); //auth,
+
 router.get("/count", auth, async (req, res) => {
   try {
     const Village = require("../models/Village");
@@ -30,5 +33,6 @@ router.get('/:id', auth, villageController.getVillage);
 router.put('/:id', auth, villageController.updateVillage);
 
 // Delete
+router.delete('/:id', auth, villageController.deleteVillage);
 
 module.exports = router;

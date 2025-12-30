@@ -13,10 +13,11 @@ const Sidebar = ({ role, children }) => {
     { name: "Villages", path: "/dashboard/admin/villages", icon: "🏡" },
     { name: "Advertise", path: "/dashboard/admin/advertise", icon: "📢" },
     { name: "Events", path: "/dashboard/admin/events", icon: "🎉" },
-    { name: "Categories", path: "/dashboard/admin/categories", icon: "🗂️" },
+   
     { name: "Users", path: "/dashboard/admin/user-list", icon: "👥" },
     { name: "Go To Frontend", path: "/", icon: "🌐", external: true },
   ];
+  {/* { name: "Categories", path: "/dashboard/admin/categories", icon: "🗂️" },*/}
 
   const managerMenu = [
     { name: "Family List", path: "/dashboard/representative/family-list", icon: "👨‍👩‍👧" },

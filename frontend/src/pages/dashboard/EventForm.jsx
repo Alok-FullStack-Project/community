@@ -24,13 +24,13 @@ export default function EventForm() {
     if (id) 
       {
         fetchEvent();
-        fetchCategories();
+       // fetchCategories();
       }
   }, [id]);
 
-  useEffect(() => {
+  /*useEffect(() => {
         fetchCategories();
-  }, []);
+  }, []);*/
 
   const fetchEvent = async () => {
     try {
@@ -43,7 +43,7 @@ export default function EventForm() {
   };
 
 
-  const fetchCategories = async () => {
+  /*const fetchCategories = async () => {
   try {
     const res = await api.get('/categories?type=event');
     setCategories(res.data);
@@ -51,7 +51,7 @@ export default function EventForm() {
     console.error(err);
     alert("Failed to load categories");
   }
-};
+}; */
 
 
 
@@ -80,9 +80,11 @@ export default function EventForm() {
     try {
       const fd = new FormData();
       fd.append("name", event.name);
+	  fd.append("event_date", event.event_date);
+	  fd.append("place", event.place);
       fd.append("description", event.description);
       fd.append("publish", event.publish);
-      fd.append("category", event.category);
+      //fd.append("category", event.category);
 
       if (event.file) fd.append("coverImage", event.file);
 
@@ -117,25 +119,6 @@ export default function EventForm() {
 
       <form className="space-y-5" onSubmit={handleSubmit}>
 
-        {/* CATEGORY */}
-        <div>
-          <label className="block font-medium mb-1">Category</label>
-          <select
-            name="category"
-            value={event.category}
-            onChange={handleChange}
-            required
-            className="w-full p-2 border rounded"
-            >
-            <option value="">Select Category</option>
-            {categories.map(cat => (
-            <option key={cat._id} value={cat._id}>
-            {cat.name} ({cat.type})
-            </option>
-            ))}
-            </select>
-        </div>
-
         {/* EVENT NAME */}
         <div>
           <label className="block font-medium mb-1">Event Name</label>
@@ -145,6 +128,33 @@ export default function EventForm() {
             value={event.name}
             onChange={handleChange}
             placeholder="Enter event name"
+            className="w-full border p-3 rounded"
+            required
+          />
+        </div>
+		 <div>
+          <label className="block font-medium mb-1">Event Date</label>
+		<input
+			type="date"
+			name="event_date"
+			value={
+			  event.event_date
+				? new Date(event.event_date).toISOString().split("T")[0]
+				: ""
+			}
+			onChange={handleChange}
+			className="w-full border p-3 rounded"
+			required
+		  />
+        </div>
+		 <div>
+          <label className="block font-medium mb-1">Event Place</label>
+          <input
+            type="text"
+            name="place"
+            value={event.place}
+            onChange={handleChange}
+            placeholder="Enter Place"
             className="w-full border p-3 rounded"
             required
           />
