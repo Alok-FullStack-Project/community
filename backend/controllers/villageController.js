@@ -195,9 +195,9 @@ exports.updateVillage = async (req, res) => {
 exports.deleteVillage = async (req, res) => {
   try {
     const { id } = req.params;
-    const hard = req.query.hard === 'true';
+   // const hard = req.query.hard === 'true';
     
-   //const hard = true;
+   const hard = true;
 
     const village = await Village.findById(id);
     if (!village) return res.status(404).json({ message: 'Village not found' });
