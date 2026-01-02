@@ -4,14 +4,26 @@ import { useNavigate, Link } from 'react-router-dom';
 
 export default function Register() {
   const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [description, setDescription] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [retype_password, setRetypePassword] = useState('');
   const nav = useNavigate();
+
+  
 
   const submit = async (e) => {
     e.preventDefault();
     try {
-      const res = await api.post('/auth/register', { name, email, password });
+
+      if(password !== retype_password)
+      {
+         alert('Password and Retype password does not match.');
+         return false;
+      }
+
+      const res = await api.post('/auth/register', { name, email,phone,description, password });
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('user', JSON.stringify(res.data.user));
 
@@ -40,12 +52,31 @@ export default function Register() {
           className="w-full p-2 border rounded"
           placeholder="Email"
         />
+         <input
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
+          className="w-full p-2 border rounded"
+          placeholder="Phone"
+        />
+         <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          className="w-full p-2 border rounded"
+          placeholder="Description"
+        />
         <input
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           type="password"
           className="w-full p-2 border rounded"
           placeholder="Password"
+        />
+        <input
+          value={retype_password}
+          onChange={(e) => setRetypePassword(e.target.value)}
+          type="password"
+          className="w-full p-2 border rounded"
+          placeholder="Retype Password"
         />
         <button
           type="submit"

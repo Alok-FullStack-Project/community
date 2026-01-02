@@ -147,6 +147,8 @@ export default function UserList() {
                 <th className="px-3 py-2 text-left">#</th>
                 <th className="px-3 py-2 text-left">User</th>
                 <th className="px-3 py-2 text-left">Email</th>
+                <th className="px-3 py-2 text-left">Phone</th>
+                <th className="px-3 py-2 text-left">Description</th>
                 <th className="px-3 py-2 text-left">Role</th>
                 <th className="px-3 py-2 text-left">Created</th>
                 <th className="px-3 py-2 text-center">Actions</th>
@@ -171,6 +173,8 @@ export default function UserList() {
                   </td>
 
                   <td className="px-3 py-2">{user.email}</td>
+                   <td className="px-3 py-2">{user.phone}</td>
+                    <td className="px-3 py-2">{user.description}</td>
 
                   <td className="px-3 py-2">{roleBadge(user.role)}</td>
 

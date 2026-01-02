@@ -5,7 +5,7 @@ const bcrypt = require('bcryptjs');
 // Create User
 exports.createUser = async (req, res) => {
   try {
-    let { name, email, password, role, nativePlaces, linkedEmails } = req.body;
+    let { name, email, password, role,phone,description, nativePlaces, linkedEmails } = req.body;
 
     // Normalize input to arrays (if single value provided)
     if (nativePlaces && !Array.isArray(nativePlaces)) {
@@ -22,6 +22,8 @@ exports.createUser = async (req, res) => {
     const user = new User({
       name,
       email,
+      phone,
+      description,
       passwordHash,
       role,
       nativePlaces,   // now array of villages
@@ -69,7 +71,7 @@ exports.getUser = async (req, res) => {
 // Update User
 exports.updateUser = async (req, res) => {
   try {
-    const { name, email, password, role, nativePlaces = [], linkedEmails = [] } = req.body;
+    const { name, email,phone,description, password, role, nativePlaces = [], linkedEmails = [] } = req.body;
 
     // ✅ Validation for representative
     if (role === "representative") {
@@ -83,6 +85,8 @@ exports.updateUser = async (req, res) => {
     const update = {
       name,
       email,
+      phone,
+      description,
       role,
       nativePlaces,
       linkedEmails,

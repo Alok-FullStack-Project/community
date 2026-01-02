@@ -12,6 +12,8 @@ export default function UserForm() {
   const [user, setUser] = useState({
     name: "",
     email: "",
+    phone: "",
+    description: "",
     password: "",
     role: "user",
     nativePlaces: [],
@@ -152,6 +154,30 @@ export default function UserForm() {
                   value={user.email}
                   onChange={handleChange}
                   type="email"
+                  required
+                  className="mt-1 p-3 border rounded-lg w-full focus:ring-2 focus:ring-indigo-300"
+                />
+              </div>
+
+               <div>
+                <label className="font-medium text-sm">Phone</label>
+                <input
+                  name="phone"
+                  value={user.phone}
+                  onChange={handleChange}
+                  type="text"
+                  required
+                  className="mt-1 p-3 border rounded-lg w-full focus:ring-2 focus:ring-indigo-300"
+                />
+              </div>
+
+               <div>
+                <label className="font-medium text-sm">Description</label>
+                <textarea
+                  name="description"
+                  value={user.description}
+                  onChange={handleChange}
+                  type="text"
                   required
                   className="mt-1 p-3 border rounded-lg w-full focus:ring-2 focus:ring-indigo-300"
                 />
