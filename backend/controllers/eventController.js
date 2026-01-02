@@ -118,6 +118,7 @@ exports.getEvent = async (req, res) => {
 exports.updateEvent = async (req, res) => {
   try {
     const { name, description, publish, coverImage,event_date,place  } = req.body;
+    console.log(req.body)
     const event = await Event.findById(req.params.id);
     if (!event) return res.status(404).json({ message: 'Event not found' });
 
@@ -125,7 +126,7 @@ exports.updateEvent = async (req, res) => {
      if (event_date !== undefined) event.event_date = event_date;
       if (place !== undefined) event.place = String(place).trim();
     if (description !== undefined) event.description = description;
-    if (publish !== undefined) event.publish = !!publish;
+    if (publish !== undefined) event.publish = publish;
     // if (category !== undefined) event.category = category;   // ADD
     //if (coverImage !== undefined) event.coverImage = coverImage;
 
@@ -142,6 +143,8 @@ exports.updateEvent = async (req, res) => {
 
     event.modifiedUser = req.user?._id;
     await event.save();
+
+    console.log(event)
 
     res.json(event);
   } catch (err) {
