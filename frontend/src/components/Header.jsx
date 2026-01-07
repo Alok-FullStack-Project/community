@@ -25,6 +25,7 @@ export default function Header() {
   const navigation = useMemo(() => {
     const base = [
       { name: "Home", href: "/", icon: <Home size={18} /> },
+       { name: "About", href: "/about", icon: <Info size={18} /> },
       { name: "Communities", href: "/community", icon: <Users size={18} /> },
       { name: "Events", href: "/events", icon: <Calendar size={18} /> },
       { name: "Advertise", href: "/advertise", icon: <Megaphone size={18} /> },
