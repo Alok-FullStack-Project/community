@@ -61,7 +61,7 @@ export default function Community() {
 
   const fetchVillages = useCallback(async () => {
     try {
-      const res = await api.get("/villages");
+      const res = await api.get("/villages/all");
       setVillages(res.data.data || []);
     } catch (err) {
       console.error("Failed to load villages", err);
@@ -81,6 +81,7 @@ export default function Community() {
         const payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
         setFamilies(payload);
         setTotalPages(res.data?.total && res.data?.limit ? Math.ceil(res.data.total / res.data.limit) : 1);
+       setTotalCount(res.data.totalRegistered);
       } catch (err) {
         setError("Failed to fetch families");
       } finally {
@@ -173,7 +174,7 @@ export default function Community() {
               <input
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
-                placeholder="Search name, mobile, email..."
+                placeholder="Search By name, mobile, email,profession,education,blood group,address..."
                 className="w-full pl-11 pr-4 py-4 bg-slate-50 border-none rounded-2xl text-slate-700 focus:ring-2 focus:ring-blue-500 transition-all"
               />
             </div>
@@ -201,7 +202,7 @@ export default function Community() {
         <div className="flex items-center justify-between mb-8">
             <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
                 <Users className="text-blue-600" size={24} />
-                {loading ? "Refreshing..." : `Registered Families (${totalCount})`}
+                {loading ? "Refreshing..." : `Registered family (${totalCount})`}
             </h2>
         </div>
 

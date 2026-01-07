@@ -4,12 +4,12 @@ const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
   name: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
+  email: { type: String, sparse: true, unique: true },
    // ✅ New fields
   phone: {
     type: String,
     trim: true,
-    required: true,
+    sparse: true,
     unique: true
   },
 
@@ -29,6 +29,14 @@ const UserSchema = new Schema({
   linkedEmails: [{ type: String }], // e.g. ["head1@gmail.com", "head2@gmail.com"]
 
   createdAt: { type: Date, default: Date.now },
+});
+
+UserSchema.pre("validate", function (next) {
+  if (!this.email && !this.phone) {
+    this.invalidate("email", "Either email or phone is required");
+    this.invalidate("phone", "Either phone or email is required");
+  }
+  next();
 });
 
 module.exports = mongoose.model("User", UserSchema);

@@ -44,7 +44,9 @@ exports.listVillages = async (req, res) => {
        let villages = [];
       villages = await Village.find({
         name : { $in: user.nativePlaces }
-      }); 
+      })
+      .sort({ name : 1 })
+      ; 
      
       return res.json({
         total: villages.length,
@@ -74,7 +76,7 @@ exports.listVillages = async (req, res) => {
     const total = await Village.countDocuments(filters);
 
     const villages = await Village.find(filters)
-      .sort({ createdDate: -1 })
+      .sort({ name : 1 })
       .skip(skip)
       .limit(limitNum)
       .lean();
@@ -103,12 +105,14 @@ exports.getAllVillages = async (req, res) => {
     // ----------------------------------------
     // 1️⃣ REPRESENTATIVE → return assigned villages ONLY
     // ----------------------------------------
-    if (user?.role === "representative") {
+  /*  if (user?.role === "representative") {
       const assignedVillages = user.nativePlaces || [];
        let villages = [];
       villages = await Village.find({
         name : { $in: user.nativePlaces }
-      }); 
+      })
+       .sort({ name : 1 })
+      ; 
      
       return res.json({
         total: villages.length,
@@ -117,14 +121,14 @@ exports.getAllVillages = async (req, res) => {
         totalPages: 1,
         data: villages,
       });
-    }
+    } */
 
     // ----------------------------------------
     // 2️⃣ ADMIN / MANAGER → normal flow (search, pagination)
     // ----------------------------------------
 
     const villages = await Village.find({publish:true})
-      .sort({ name : -1 })
+      .sort({ name : 1 })
       .lean();
 
     res.json({

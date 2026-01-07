@@ -199,9 +199,14 @@ exports.listFamilies = async (req, res) => {
         { name: regex },
         { email: regex },
         { mobile: regex },
+        { blood_group: regex },
+        { profession: regex },
+        { education: regex },
+        { profession_address: regex },
+        { residence_address: regex },
         { _id: { $in: familyIdsFromMembers } },
       ];
-    }
+    }  //   
 
     // Step 4️⃣: Query Family collection
     const families = await Family.find(filter)
@@ -210,9 +215,26 @@ exports.listFamilies = async (req, res) => {
       .skip((page - 1) * limit)
       .limit(limit);
 
-    const total = await Family.countDocuments(filter);
+    const familyCount = await Family.countDocuments(filter);
+   
 
-    res.json({ total, page, limit, data: families });
+     // 🔹 No filter → all members
+    if (Object.keys(filter).length === 0) {
+      memberCount = await FamilyMember.countDocuments({});
+    }
+    // 🔹 Filter applied → members of filtered families
+    else {
+      const familyIds = families.map(f => f._id);
+      
+      memberCount = await FamilyMember.countDocuments({
+        familyId : { $in: familyIds },
+      });
+    }
+
+
+     let totalRegistered = familyCount + memberCount;
+
+    res.json({familyCount,memberCount, totalRegistered,total : familyCount, page, limit, data: families });
   } catch (error) {
     console.error("Error listing families:", error);
     res.status(500).json({ message: "Server error" });

@@ -255,7 +255,7 @@ export default function EventAdmin() {
                   </td>
 
                   <td className="border px-3 py-2">
-                    {new Date(event.createdAt).toLocaleDateString()}
+                    {new Date(event.createdDate).toLocaleDateString()}
                   </td>
 
                   {/* Status Toggle */}

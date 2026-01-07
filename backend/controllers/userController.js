@@ -7,6 +7,29 @@ exports.createUser = async (req, res) => {
   try {
     let { name, email, password, role,phone,description, nativePlaces, linkedEmails } = req.body;
 
+        // ✅ Require email OR phone
+        if (!email && !phone) {
+          return res.status(400).json({
+            message: "Email or phone is required"
+          });
+        }
+    
+        // ✅ Check duplicate email or phone
+        const existing = await User.findOne({
+          $or: [
+            email ? { email } : null,
+            phone ? { phone } : null
+          ].filter(Boolean)
+        });
+    
+        if (existing) {
+          return res.status(400).json({
+            message: existing.email === email
+              ? "Email already exists"
+              : "Phone already exists"
+          });
+        }
+
     // Normalize input to arrays (if single value provided)
     if (nativePlaces && !Array.isArray(nativePlaces)) {
       nativePlaces = [nativePlaces];
@@ -18,11 +41,14 @@ exports.createUser = async (req, res) => {
     // Hash password
     const passwordHash = await bcrypt.hash(password, 10);
 
+    const emailValue = email?.trim() || undefined;
+    const phoneValue = phone?.trim() || undefined;
+
     // Create new user
     const user = new User({
       name,
-      email,
-      phone,
+      email:emailValue,
+      phone:phoneValue,
       description,
       passwordHash,
       role,

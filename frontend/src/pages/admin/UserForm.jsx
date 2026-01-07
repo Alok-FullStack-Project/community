@@ -22,12 +22,50 @@ export default function UserForm() {
 
   const [villages, setVillages] = useState([]);
   const [headEmails, setHeadEmails] = useState([]);
+  const [villageSearch, setVillageSearch] = useState("");
+  const [emailSearch, setEmailSearch] = useState("");
+
+  const filteredVillages = villages.filter(v =>
+  v.name.toLowerCase().includes(villageSearch.toLowerCase())
+);
+
+const toggleVillage = (name) => {
+  setUser(prev => {
+    const exists = prev.nativePlaces.includes(name);
+    return {
+      ...prev,
+      nativePlaces: exists
+        ? prev.nativePlaces.filter(v => v !== name)
+        : [...prev.nativePlaces, name],
+    };
+  });
+};
+//console.log(headEmails)
+const filteredEmails = headEmails.filter(e =>
+  e?.toLowerCase().includes(emailSearch.toLowerCase())
+);
+//const filteredEmails = headEmails;
+//console.log(filteredEmails)
+
+const toggleEmail = (email) => {
+  setUser(prev => {
+    const exists = prev.linkedEmails.includes(email);
+    return {
+      ...prev,
+      linkedEmails: exists
+        ? prev.linkedEmails.filter(e => e !== email)
+        : [...prev.linkedEmails, email],
+    };
+  });
+};
+
+
 
   // Load villages & emails
   useEffect(() => {
     const loadData = async () => {
       try {
-        const vRes = await api.get("/villages");
+        const vRes = await api.get("/villages/all");
         setVillages(vRes.data.data || []);
 
         const hRes = await api.get("/family/head-emails");
@@ -154,7 +192,6 @@ export default function UserForm() {
                   value={user.email}
                   onChange={handleChange}
                   type="email"
-                  required
                   className="mt-1 p-3 border rounded-lg w-full focus:ring-2 focus:ring-indigo-300"
                 />
               </div>
@@ -166,7 +203,6 @@ export default function UserForm() {
                   value={user.phone}
                   onChange={handleChange}
                   type="text"
-                  required
                   className="mt-1 p-3 border rounded-lg w-full focus:ring-2 focus:ring-indigo-300"
                 />
               </div>
@@ -178,7 +214,6 @@ export default function UserForm() {
                   value={user.description}
                   onChange={handleChange}
                   type="text"
-                  required
                   className="mt-1 p-3 border rounded-lg w-full focus:ring-2 focus:ring-indigo-300"
                 />
               </div>
@@ -218,72 +253,132 @@ export default function UserForm() {
           </div>
 
           {/* REPRESENTATIVE → SELECT VILLAGES */}
-          {user.role === "representative" && (
-            <div className="pt-4 border-t">
-              <h3 className="text-lg font-semibold mb-3 text-indigo-700">
-                Assigned Villages
-              </h3>
+         {user.role === "representative" && (
+  <div className="pt-4 border-t">
+    <h3 className="text-lg font-semibold mb-3 text-indigo-700">
+      Assigned Villages
+    </h3>
 
-              <select
-                multiple
-                value={user.nativePlaces}
-                onChange={handleVillageChange}
-                className="p-3 border rounded-lg w-full h-40"
-              >
-                {villages.map((v) => (
-                  <option key={v._id} value={v.name}>
-                    {v.name}
-                  </option>
-                ))}
-              </select>
+    {/* Search */}
+    <input
+      placeholder="Search village..."
+      value={villageSearch}
+      onChange={(e) => setVillageSearch(e.target.value)}
+      className="mb-3 w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-300"
+    />
 
-              {/* Selected Tags */}
-              <div className="flex flex-wrap gap-2 mt-3">
-                {user.nativePlaces.map((v) => (
-                  <span
-                    key={v}
-                    className="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm"
-                  >
-                    {v}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
+    {/* Dropdown list */}
+    <div className="border rounded-lg max-h-48 overflow-y-auto bg-white">
+      {filteredVillages.map((v) => (
+        <label
+          key={v._id}
+          className="flex items-center gap-3 px-4 py-2 hover:bg-indigo-50 cursor-pointer"
+        >
+          <input
+            type="checkbox"
+            checked={user.nativePlaces.includes(v.name)}
+            onChange={() => toggleVillage(v.name)}
+            className="accent-indigo-600"
+          />
+          <span>{v.name}</span>
+        </label>
+      ))}
+
+      {filteredVillages.length === 0 && (
+        <div className="px-4 py-3 text-sm text-gray-400">
+          No villages found
+        </div>
+      )}
+    </div>
+
+    {/* Selected Chips */}
+    {user.nativePlaces.length > 0 && (
+      <div className="flex flex-wrap gap-2 mt-4">
+        {user.nativePlaces.map((v) => (
+          <span
+            key={v}
+            className="flex items-center gap-2 px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-sm"
+          >
+            {v}
+            <button
+              type="button"
+              onClick={() => toggleVillage(v)}
+              className="hover:text-red-500 font-bold"
+            >
+              ✕
+            </button>
+          </span>
+        ))}
+      </div>
+    )}
+  </div>
+)}
+
 
           {/* USER → SELECT HEAD EMAILS */}
-          {user.role === "user" && (
-            <div className="pt-4 border-t">
-              <h3 className="text-lg font-semibold mb-3 text-indigo-700">
-                Linked Family Head Emails
-              </h3>
+{/* USER → SELECT HEAD EMAILS */}
+{user.role === "user" && (
+  <div className="pt-6 border-t">
+    <h3 className="text-lg font-semibold mb-3 text-indigo-700">
+      Linked Family Head Emails
+    </h3>
 
-              <select
-                multiple
-                value={user.linkedEmails}
-                onChange={handleEmailChange}
-                className="p-3 border rounded-lg w-full h-40"
-              >
-                {headEmails.map((email) => (
-                  <option key={email} value={email}>
-                    {email}
-                  </option>
-                ))}
-              </select>
+    {/* Search */}
+    <input
+      placeholder="Search email..."
+      value={emailSearch}
+      onChange={(e) => setEmailSearch(e.target.value)}
+      className="mb-3 w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-300"
+    />
 
-              {/* Selected Tags */}
-              <div className="flex flex-wrap gap-2 mt-3">
-                {user.linkedEmails.map((em) => (
-                  <span
-                    key={em}
-                    className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm"
-                  >
-                    {em}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
+    {/* Email list */}
+    <div className="border rounded-lg max-h-48 overflow-y-auto bg-white">
+      {filteredEmails.map((email,index) => (
+        <label
+          key={index}
+          className="flex items-center gap-3 px-4 py-2 hover:bg-indigo-50 cursor-pointer"
+        >
+          <input
+            type="checkbox"
+            checked={user.linkedEmails.includes(email)}
+            onChange={() => toggleEmail(email)}
+            className="accent-indigo-600"
+            disabled={!email}
+          />
+          <span>{email}</span>
+        </label>
+      ))}
+
+      {filteredEmails.length === 0 && (
+        <div className="px-4 py-3 text-sm text-gray-400">
+          No emails found
+        </div>
+      )}
+    </div>
+
+    {/* Selected Chips */}
+    {user.linkedEmails.length > 0 && (
+      <div className="flex flex-wrap gap-2 mt-4">
+        {user.linkedEmails.map((email) => (
+          <span
+            key={email}
+            className="flex items-center gap-2 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm"
+          >
+            {email}
+            <button
+              type="button"
+              onClick={() => toggleEmail(email)}
+              className="hover:text-red-500 font-bold"
+            >
+              ✕
+            </button>
+          </span>
+        ))}
+      </div>
+    )}
+  </div>
+)}
+
 
           {/* BUTTONS */}
           <div className="flex justify-end gap-3 pt-6 border-t">

@@ -38,7 +38,8 @@ const FamilyList = ({ role }) => {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
-  const [familyCount, setFamilycount] = useState(1);
+  const [familyCount, setFamilycount] = useState(0);
+  const [memberCount, setMembercount] = useState(0);
 
   const navigate = useNavigate();
 
@@ -65,6 +66,8 @@ const FamilyList = ({ role }) => {
 
       setFamilies(data.data);
       setTotalPages(Math.ceil(data.total / 20));
+      setFamilycount(data.familyCount);
+      setMembercount(data.memberCount);
     } catch (err) {
       console.error(err);
       alert('Failed to load families');
@@ -105,7 +108,7 @@ const FamilyList = ({ role }) => {
   useEffect(() => {
     fetchFamilies();
     fetchVillages();
-    fetchFamilyCount();
+   // fetchFamilyCount();
   }, [page, selectedVillage]);
 
   // --- Debounced search ---
@@ -162,7 +165,7 @@ const FamilyList = ({ role }) => {
     <div>
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-3">
-        <h2 className="text-xl font-semibold">Family List ({familyCount})</h2>
+        <h2 className="text-xl font-semibold">{`Registered families (${familyCount}) Registered Members (${memberCount})`}</h2>
 
         <div className="flex flex-wrap gap-3">
           {/* Village Filter */}
@@ -189,7 +192,7 @@ const FamilyList = ({ role }) => {
               setPage(1);
             }}
             className="border border-gray-300 rounded p-2 w-60"
-            placeholder="Search by name, email, mobile"
+            placeholder="Search By name, mobile, email,profession,education,blood group,address..."
           />
 
           {/* Add Family (Admin and Representative only) */}
