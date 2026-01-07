@@ -81,7 +81,7 @@ export default function Community() {
         const payload = Array.isArray(res.data) ? res.data : res.data?.data || [];
         setFamilies(payload);
         setTotalPages(res.data?.total && res.data?.limit ? Math.ceil(res.data.total / res.data.limit) : 1);
-       setTotalCount(res.data.totalRegistered);
+       setTotalCount(res.data.familyCount);
       } catch (err) {
         setError("Failed to fetch families");
       } finally {

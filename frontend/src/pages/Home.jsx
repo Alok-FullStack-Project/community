@@ -22,7 +22,7 @@ const Home = () => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const res = await api.get("/events");
+        const res = await api.get("/events?publish=true");
         setEvents(res.data.data || []);
       } catch (err) {
         console.error("Error fetching events:", err);
