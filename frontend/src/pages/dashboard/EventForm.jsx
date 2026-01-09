@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../../api/api";
+import { Section } from "../../components/Section";
 
 const emptyEvent = {
   name: "",
@@ -111,6 +112,8 @@ export default function EventForm() {
   // UI
   // ------------------------------
   return (
+     <>
+        <Section title1="Event" tittle2="Management"/>
     <div className="p-6 bg-white rounded-xl shadow-md max-w-xl mx-auto">
 
       <h2 className="text-2xl font-bold mb-6">
@@ -224,5 +227,6 @@ export default function EventForm() {
         </div>
       </form>
     </div>
+     </>
   );
 }

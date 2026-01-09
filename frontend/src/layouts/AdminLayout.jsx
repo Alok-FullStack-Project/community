@@ -1,19 +1,18 @@
 // layouts/AdminLayout.jsx
 import React from "react";
-import Sidebar from "../components/Sidebar";
 import { Outlet } from "react-router-dom";
-import LogoutButton from "../components/LogoutButton";
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 
 const AdminLayout = () => {
   return (
-    <div className="flex min-h-screen bg-slate-100">
-      <Sidebar role="admin">
-        <LogoutButton />
-      </Sidebar>
-
-      <main className="flex-1 p-8">
-        <Outlet /> {/* Each page loads here */}
-      </main>
+    <div className="min-h-screen flex flex-col">
+          <Header />
+          <main className="flex-1 container mx-auto p-0">
+     
+            <Outlet />
+          </main>
+          <Footer />
     </div>
   );
 };

@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Link, useNavigate } from 'react-router-dom';
+import { Section } from "../../components/Section";
 
 const backend_url = import.meta.env.VITE_URL;
 const API_BASE = import.meta.env.VITE_API_URL + '/family';
@@ -162,9 +163,13 @@ const FamilyList = ({ role }) => {
   };
 
   return (
-    <div>
+   
+    <div className="pt-3 mt-6">
+      <Section title1="Family" tittle2="List"/>
+       <div className="pt-3 mt-6"></div>
       {/* Header */}
       <div className="flex flex-col md:flex-row justify-between items-center mb-4 gap-3">
+        
         <h2 className="text-xl font-semibold">{`Registered families (${familyCount}) Registered Members (${memberCount})`}</h2>
 
         <div className="flex flex-wrap gap-3">

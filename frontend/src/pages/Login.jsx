@@ -20,11 +20,11 @@ export default function Login() {
 
       // 🔹 Redirect based on role
       if (res.data.user.role === 'admin')
-        nav('/dashboard/admin/family-list');
+        nav('/community');
       else if (res.data.user.role === 'representative')
-        nav('/dashboard/representative/family-list');
+        nav('/community');
       else if (res.data.user.role === 'user')
-        nav('/dashboard/user/family-list');
+        nav('/community');
       else nav('/community');
     } catch (err) {
       alert(err?.response?.data?.message || 'Login failed');

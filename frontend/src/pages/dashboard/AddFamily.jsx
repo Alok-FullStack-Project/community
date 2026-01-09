@@ -2,6 +2,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import api from "../../api/api";
 import { useNavigate } from "react-router-dom";
+import { Section } from "../../components/Section";
 
 /*
   Features:
@@ -258,6 +259,8 @@ export default function AddFamilyWizard() {
   // JSX for steps
   // -------------------------
   return (
+    <>
+        <Section title1="Family" tittle2="Management"/>
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-2xl shadow-xl">
       {/* Header + progress */}
       <div className="mb-6">
@@ -658,6 +661,7 @@ export default function AddFamilyWizard() {
 		  </div>
       </div>
     </div>
+    </>
   );
 
   // helpers inside component

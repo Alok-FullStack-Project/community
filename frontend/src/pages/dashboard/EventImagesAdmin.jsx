@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../../api/api";
+import { Section } from "../../components/Section";
 
 export default function EventImagesAdmin() {
   const { eventId } = useParams();
@@ -135,8 +136,10 @@ export default function EventImagesAdmin() {
   /* ================= UI ================= */
 
   return (
-    <div className="max-w-6xl mx-auto">
 
+    <>
+        <Section title1="Event" tittle2="Management"/>
+    <div className="max-w-6xl mx-auto pt-5">
       {/* Back */}
       <button
         onClick={() => navigate("/dashboard/admin/events")}
@@ -294,5 +297,6 @@ export default function EventImagesAdmin() {
         ))}
       </div>
     </div>
+    </>
   );
 }

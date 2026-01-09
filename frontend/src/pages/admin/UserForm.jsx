@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../../api/api";
+import { Section } from "../../components/Section";
 
 export default function UserForm() {
   const navigate = useNavigate();
@@ -148,7 +149,9 @@ const toggleEmail = (email) => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-6 mt-10">
+     <>
+        <Section title1="User" tittle2="Management"/>
+    <div className="max-w-3xl mx-auto p-3 mt-5">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-3xl font-bold text-gray-800">
@@ -401,5 +404,6 @@ const toggleEmail = (email) => {
         </form>
       </div>
     </div>
+    </>
   );
 }

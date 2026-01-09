@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../../api/api";
+import { Section } from "../../components/Section";
 
 export default function EventAdmin() {
   const [events, setEvents] = useState([]);
@@ -142,11 +143,13 @@ export default function EventAdmin() {
   };
 
   return (
+    <>
+    <Section title1="Event" tittle2="Management"/>
     <div className="p-6 bg-white shadow rounded-xl">
 
       {/* HEADER */}
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-3xl font-bold">Event Management</h2>
+       {/** <h2 className="text-3xl font-bold">Event Management</h2>*/} 
         <Link
           to="/dashboard/admin/events/add"
           className="px-4 py-2 bg-indigo-600 text-white rounded-lg shadow hover:bg-indigo-700"
@@ -327,5 +330,6 @@ export default function EventAdmin() {
         </div>
       </div>
     </div>
+    </>
   );
 }

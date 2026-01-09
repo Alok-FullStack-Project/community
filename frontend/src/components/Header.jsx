@@ -41,8 +41,36 @@ export default function Header() {
       roleItems = [{ name: "Dashboard", href: "/dashboard/user/family-list", icon: <LayoutDashboard size={18} /> }];
     }
 
-    return [...base, ...roleItems];
+    return [...base]; //, ...roleItems
   }, [user?.role]);
+
+    const adminMenu = [
+    { name: "Dashboard", path: "/dashboard/admin", icon: "📊" },
+    { name: "Family List", path: "/dashboard/admin/family-list", icon: "👨‍👩‍👧" },
+    // { name: "Add Family", path: "/dashboard/admin/add-family", icon: "➕" },
+    { name: "Villages", path: "/dashboard/admin/villages", icon: "🏡" },
+    { name: "Advertise", path: "/dashboard/admin/advertise", icon: "📢" },
+    { name: "Events", path: "/dashboard/admin/events", icon: "🎉" },
+   
+    { name: "Users", path: "/dashboard/admin/user-list", icon: "👥" },
+   
+  ];
+  {/* { name: "Categories", path: "/dashboard/admin/categories", icon: "🗂️" },
+      { name: "Go To Frontend", path: "/", icon: "🌐", external: true },
+      { name: "Go To Frontend", path: "/", icon: "🌐", external: true },
+      { name: "Go To Frontend", path: "/", icon: "🌐", external: true },
+    
+    */}
+
+  const managerMenu = [
+    { name: "Family List", path: "/dashboard/representative/family-list", icon: "👨‍👩‍👧" },
+  ];
+
+  const userMenu = [
+    { name: "Family List", path: "/dashboard/user/family-list", icon: "👨‍👩‍👧" },
+  ];
+
+  const menu = user?.role === "admin" ? adminMenu : user?.role === "representative" ?   managerMenu : userMenu;
 
   // Handle Scroll effect
   useEffect(() => {
@@ -146,19 +174,76 @@ export default function Header() {
                   <ChevronDown size={14} className={`transition-transform ${avatarOpen ? 'rotate-180' : ''}`} />
                 </button>
 
-                {avatarOpen && (
-                  <div className="absolute right-0 mt-2 w-52 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-top-2">
-                    <div className="px-5 py-4 bg-slate-50/50 border-b border-slate-100">
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mb-1">Signed in as</p>
-                      <p className="text-sm font-bold text-slate-800 truncate">{user.name}</p>
-                    </div>
-                    
-                    {/* This container ensures the button has equal padding on all sides */}
-                    <div className="p-3">
-                      <LogoutButton className="w-full justify-center" />
-                    </div>
-                  </div>
-                )}
+                
+
+            {avatarOpen && (
+  <div className="absolute right-0 mt-3 w-56 bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden animate-in fade-in slide-in-from-top-2">
+    
+    {/* User Info */}
+    <div className="px-5 py-4 bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200">
+      <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest mb-1">
+        Signed in as
+      </p>
+      <p className="text-sm font-semibold text-slate-900 truncate">
+        {user.name}
+      </p>
+    </div>
+
+    {/* Menu */}
+    <nav className="px-3 py-3 space-y-1">
+      {menu.map((item) => {
+        const active = pathname === item.path;
+
+        const base =
+          "flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-200";
+
+        const activeCls =
+          "bg-indigo-600 text-white shadow-sm";
+
+        const inactiveCls =
+          "text-slate-700 hover:bg-slate-100 hover:text-slate-900";
+
+        if (item.external) {
+          return (
+            <a
+              key={item.name}
+              href={item.path}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${base} ${inactiveCls}`}
+               onClick={() => setAvatarOpen(false)}
+            >
+              <span className="text-lg opacity-80">{item.icon}</span>
+              <span>{item.name}</span>
+            </a>
+          );
+        }
+
+        return (
+          <Link
+            key={item.name}
+            to={item.path}
+            className={`${base} ${active ? activeCls : inactiveCls}`}
+            aria-current={active ? "page" : undefined}
+             onClick={() => setAvatarOpen(false)}
+          >
+            <span className="text-lg opacity-80">{item.icon}</span>
+            <span>{item.name}</span>
+          </Link>
+        );
+      })}
+    </nav>
+
+    {/* Divider */}
+    <div className="border-t border-slate-200" />
+
+    {/* Logout */}
+    <div className="p-3">
+      <LogoutButton className="w-full justify-center rounded-xl hover:bg-red-50 hover:text-red-600 transition" />
+    </div>
+  </div>
+)}
+
               </div>
             )}
 

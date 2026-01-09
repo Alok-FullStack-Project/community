@@ -1,21 +1,18 @@
 import React from 'react';
-import Sidebar from '../components/Sidebar';
-import LogoutButton from '../components/LogoutButton';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 import { Outlet } from 'react-router-dom';
 
 const ManagerLayout = () => {
   return (
-    <div className="flex min-h-screen">
-      <Sidebar role="user">
-        <div className="mt-auto">
-          <LogoutButton />
-        </div>
-      </Sidebar>
-      <main className="flex-1 p-8 bg-gray-100">
-        <h1 className="text-2xl font-bold mb-6">Manager Dashboard</h1>
-        <Outlet />
-      </main>
-    </div>
+    <div className="min-h-screen flex flex-col">
+                 <Header />
+                 <main className="flex-1 container mx-auto p-0">
+            
+                   <Outlet />
+                 </main>
+                 <Footer />
+           </div>
   );
 };
 

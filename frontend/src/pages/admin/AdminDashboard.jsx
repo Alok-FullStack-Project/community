@@ -9,6 +9,7 @@ import {
 
 import api from "../../api/api";
 import { Link } from "react-router-dom";
+import { Section } from "../../components/Section";
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
@@ -74,14 +75,15 @@ const AdminDashboard = () => {
 
   return (
     <>
-      {/* HEADER */}
+     <Section title1="Admin" tittle2="Dashboard"/>
+      {/* HEADER 
       <h1 className="text-3xl font-bold text-slate-800 mb-2">
-        Admin Dashboard
+        Admin Dashboard 111
       </h1>
       <p className="text-slate-500 mb-8">
         Analytics & insights for your community portal
-      </p>
-
+      </p>*/}
+  <p className="text-slate-500 mb-8"></p>
       {/* STAT CARDS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-10">
         <StatCard label="Families" value={stats.families} icon="👨‍👩‍👧" />

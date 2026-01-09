@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import api from "../../api/api";
 import { toast } from "react-toastify";
+import { Section } from "../../components/Section";
 
 export default function VillageAdmin() {
   const [villages, setVillages] = useState([]);
@@ -94,9 +95,12 @@ useEffect(() => {
   //const pageData = filtered.slice((page - 1) * rowsPerPage, page * rowsPerPage);
 
   return (
+    <>
+  
+    <Section title1="Village" tittle2="Management"/>
     <div className="p-6 max-w-6xl mx-auto">
 
-      <h1 className="text-3xl font-bold text-slate-800 mb-6">Village Management</h1>
+      {/*<h1 className="text-3xl font-bold text-slate-800 mb-6">Village Management</h1>*/}
 
       {/* Add / Edit Form */}
       <div className="bg-white border rounded-xl shadow p-6 mb-8">
@@ -274,5 +278,6 @@ useEffect(() => {
         </div>
       )}
     </div>
+    </>
   );
 }

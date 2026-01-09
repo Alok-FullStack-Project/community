@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../../api/api";
 import { Link } from "react-router-dom";
+import { Section } from "../../components/Section";
 
 export default function AdvertiseAdmin() {
   const [ads, setAds] = useState([]);
@@ -122,11 +123,13 @@ export default function AdvertiseAdmin() {
   };
 
   return (
+    <>
+    <Section title1="Advertise" tittle2="Management"/>
     <div className="max-w-6xl mx-auto p-6">
 
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-3xl font-semibold text-slate-800">Manage Advertisements</h2>
+       {/** <h2 className="text-3xl font-semibold text-slate-800">Manage Advertisements</h2>*/} 
 
         <Link
           to="/dashboard/admin/advertise/add"
@@ -327,5 +330,6 @@ export default function AdvertiseAdmin() {
         </div>
       )}
     </div>
+    </>
   );
 }

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../../api/api";
+import { Section } from "../../components/Section";
 
 export default function UserList() {
   const [users, setUsers] = useState([]);
@@ -92,11 +93,14 @@ export default function UserList() {
   };
 
   return (
+ <>
+    <Section title1="User" tittle2="Management"/>
+
     <div className="p-6 bg-white rounded-2xl shadow-md">
 
       {/* Header Row */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6 gap-3">
-        <h2 className="text-2xl font-bold text-gray-800">User Management</h2>
+      {/*  <h2 className="text-2xl font-bold text-gray-800">User Management</h2>*/}
 
         <Link
           to="/dashboard/admin/add-user"
@@ -232,5 +236,6 @@ export default function UserList() {
         </div>
       )}
     </div>
+    </>
   );
 }

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../../api/api";
+import { Section } from "../../components/Section";
 
 const emptyAd = {
   name: "",
@@ -101,6 +102,8 @@ export default function AdvertiseForm() {
   };
 
   return (
+    <>
+        <Section title1="Advertise" tittle2="Management"/>
     <div className="max-w-4xl mx-auto p-6">
 
       <h2 className="text-3xl font-semibold mb-6 text-slate-800 flex items-center gap-2">
@@ -289,5 +292,6 @@ export default function AdvertiseForm() {
 
       </div>
     </div>
+    </>
   );
 }
