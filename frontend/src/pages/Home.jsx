@@ -17,6 +17,7 @@ const Home = () => {
   const [ads, setAds] = useState([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
   const [loadingAds, setLoadingAds] = useState(true);
+    const backend_url = import.meta.env.VITE_BACKEND_URL;
 
   // Fetch Events
   useEffect(() => {
@@ -88,7 +89,7 @@ const Home = () => {
                       <div className="group bg-slate-50 hover:bg-white p-3 rounded-2xl border border-transparent hover:border-indigo-100 hover:shadow-md transition-all duration-300">
                         <div className="relative h-28 w-full rounded-xl overflow-hidden mb-3">
                           <img 
-                            src={event.coverImage || "/api/placeholder/400/320"} 
+                            src={`${backend_url}${event.coverImage}` || "/api/placeholder/400/320"} 
                             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                             alt={event.name} 
                           />

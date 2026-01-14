@@ -24,6 +24,7 @@ const EventDetails = () => {
   const [popupImage, setPopupImage] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const backend_url = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     const fetchEvent = async () => {
@@ -137,7 +138,7 @@ const EventDetails = () => {
             <div className="bg-white p-4 rounded-[2.5rem] shadow-2xl shadow-slate-200 border border-slate-100">
               <div className="rounded-[2rem] overflow-hidden aspect-video">
                 <img 
-                  src={event.coverImage || "https://placehold.co/800x450?text=No+Image"} 
+                  src={`${backend_url}${event.coverImage}` || "https://placehold.co/800x450?text=No+Image"} 
                   className="w-full h-full object-cover" 
                   alt={event.name} 
                 />
@@ -166,7 +167,7 @@ const EventDetails = () => {
                       className="group relative cursor-pointer rounded-2xl overflow-hidden aspect-square border-4 border-white shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
                       onClick={() => setPopupImage(img)}
                     >
-                      <img src={img.url} alt={img.caption} className="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all" />
+                      <img src={`${backend_url}${img.url}`} alt={img.caption} className="w-full h-full object-cover grayscale-[0.2] group-hover:grayscale-0 transition-all" />
                       <div className="absolute inset-0 bg-indigo-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                          <span className="text-white text-xs font-bold uppercase tracking-widest">View Image</span>
                       </div>
@@ -247,7 +248,7 @@ const EventDetails = () => {
             </div>
 
             <img 
-              src={popupImage.url} 
+              src={ `${backend_url}${popupImage.url}`} 
               className="max-h-[80vh] w-auto rounded-3xl shadow-2xl border-4 border-white/10" 
               alt="Popup" 
             />

@@ -1,8 +1,8 @@
-/*const multer = require('multer');
+const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 
-// Multer storage configuration
+// Multer storage configuration for local
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     let uploadPath = 'uploads/family/'; // Default path
@@ -12,6 +12,8 @@ const storage = multer.diskStorage({
     } else if (req.baseUrl.includes('/events')) {
       uploadPath = 'uploads/events/';
     } else if (req.baseUrl.includes('/add-family')) {
+      uploadPath = 'uploads/family/';
+    }else if (req.baseUrl.includes('/edit-family')) {
       uploadPath = 'uploads/family/';
     }
 
@@ -45,10 +47,12 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB
 });
 
-module.exports = upload; */
+module.exports = upload; 
 
 
-const multer = require("multer");
+// Multer storage configuration for image kit
+
+/*const multer = require("multer");
 
 const upload = multer({
   storage: multer.memoryStorage(), // Store file in buffer
@@ -61,5 +65,5 @@ const upload = multer({
   },
 });
 
-module.exports = upload;
+module.exports = upload;*/
 

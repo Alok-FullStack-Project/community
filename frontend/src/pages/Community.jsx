@@ -10,6 +10,7 @@ import {
 // Helper hook for ESC and Outside Click
 function useCloseEvents(onClose, isActive) {
   const modalRef = useRef(null);
+  
 
   useEffect(() => {
     if (!isActive) return; // Only listen if this specific modal is active
@@ -56,6 +57,7 @@ export default function Community() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { setPreviewUrl, ImagePreview } = useImagePreview();
   const [miniProfile, setMiniProfile] = useState(null);
+  const backend_url = import.meta.env.VITE_BACKEND_URL;
 
   const openMiniProfile = (m) => setMiniProfile(m);
 
@@ -126,7 +128,7 @@ export default function Community() {
     setIsModalOpen(true);
   };
 
-  const getImageUrl = (path) => path ? `${path}` : "/no_image.png";
+  const getImageUrl = (path) => path ? `${backend_url}${path}` : "/no_image.png";
 
   return (
     <div className="min-h-screen bg-slate-50/50">

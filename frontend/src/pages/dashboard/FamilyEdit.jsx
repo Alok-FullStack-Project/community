@@ -17,7 +17,7 @@ export default function FamilyEdit() {
   const token = localStorage.getItem("token");
   const user = JSON.parse(localStorage.getItem("user") || "{}");
   const role = user.role || null;
-  
+  const backend_url = import.meta.env.VITE_BACKEND_URL;
 
   // --------------------------------
   // LOAD MEMBER OR FAMILY HEAD
@@ -324,7 +324,7 @@ export default function FamilyEdit() {
             />
             {imagePreview && (
               <img
-                src={imagePreview}
+                src={`${backend_url}${imagePreview}`}
                 className="w-28 h-28 mt-3 rounded-full object-cover border"
               />
             )}
@@ -480,7 +480,7 @@ export default function FamilyEdit() {
         <strong>Photo:</strong><br />
         {imagePreview ? (
           <img
-            src={imagePreview}
+            src={`${backend_url}${imagePreview}`}
             className="w-28 h-28 mt-2 rounded-full object-cover border"
           />
         ) : (

@@ -8,6 +8,7 @@ import { Calendar, ArrowRight, MapPin, Search, Filter } from "lucide-react";
 export default function Events() {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
+  const backend_url = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     async function fetchEvents() {
@@ -88,7 +89,7 @@ export default function Events() {
                 <div className="relative h-60 overflow-hidden">
                   {event.coverImage ? (
                     <img
-                      src={event.coverImage}
+                      src={`${backend_url}${event.coverImage}`}
                       alt={event.name}
                       className="h-full w-full object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
                     />

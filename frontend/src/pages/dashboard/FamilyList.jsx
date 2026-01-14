@@ -44,6 +44,8 @@ const FamilyList = ({ role }) => {
 
   const navigate = useNavigate();
 
+  const backend_url = import.meta.env.VITE_BACKEND_URL;
+
   // --- Get logged-in user ---
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -232,7 +234,7 @@ const FamilyList = ({ role }) => {
   className="font-bold text-lg text-gray-700 cursor-pointer flex items-center space-x-4"
 >
   <img
-    src={family.image ? family.image : "/no_image.png"}
+    src={family.image ? `${backend_url}${family.image}` : "/no_image.png"}
     className="w-12 h-12 rounded-full object-cover border"
   />
 
@@ -295,7 +297,7 @@ const FamilyList = ({ role }) => {
                         <tr key={m._id} className="text-center border-t">
                           <td className="px-4 py-2">
                             <img
-                              src={m.image ? m.image : "/no_image.png"}
+                              src={m.image ?  `${backend_url}${m.image}` : "/no_image.png"}
                               className="w-12 h-12 rounded-full object-cover mx-auto border"
                             />
                           </td>
@@ -400,7 +402,7 @@ const FamilyList = ({ role }) => {
               <img
                 src={
                   selectedMember.image
-                    ? selectedMember.image
+                    ? `${backend_url}${selectedMember.image}` 
                     : "/no_image.png"
                 }
                 className="w-32 h-32 rounded-full object-cover border-4 shadow-md"

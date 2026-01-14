@@ -1,6 +1,8 @@
 const Event = require('../models/Event');
 const EventImage = require('../models/EventImage');
 const imagekit = require("../utils/imagekit");
+const path = require('path');
+const fs = require('fs');
 
 /**
  * Create new Event
@@ -16,20 +18,18 @@ exports.createEvent = async (req, res) => {
 
     // if (!category) return res.status(400).json({ message: 'Category required' });
 
-     let image = "";
+   /*  let image = "";
         if (req.file) {
           const uploadRes = await imagekit.upload({
             file: req.file.buffer,
             fileName: req.file.originalname,
-            folder: "/advertise",
+            folder: "/events",
           });
     
           image = uploadRes.url;
         }
-    
-    
-
-   //   const image = req.file ? `/uploads/events/${req.file.filename}` : undefined;
+      */
+    const image = req.file ? `/uploads/events/${req.file.filename}` : undefined;
 
     const event = new Event({
       name: name.trim(),
@@ -118,7 +118,6 @@ exports.getEvent = async (req, res) => {
 exports.updateEvent = async (req, res) => {
   try {
     const { name, description, publish, coverImage,event_date,place  } = req.body;
-    console.log(req.body)
     const event = await Event.findById(req.params.id);
     if (!event) return res.status(404).json({ message: 'Event not found' });
 
@@ -130,7 +129,7 @@ exports.updateEvent = async (req, res) => {
     // if (category !== undefined) event.category = category;   // ADD
     //if (coverImage !== undefined) event.coverImage = coverImage;
 
-    if (req.file) {
+   /* if (req.file) {
           const uploadRes = await imagekit.upload({
             file: req.file.buffer,
             fileName: req.file.originalname,
@@ -139,13 +138,31 @@ exports.updateEvent = async (req, res) => {
          // image = uploadRes.url;
         event.coverImage = uploadRes.url;
         }
-    
+    */
+
+    if (req.file) {
+       // Delete old file if exists
+      if (event.coverImage) {
+        const oldImagePath = path.join(
+          __dirname,
+          "..",
+          event.coverImage
+        );
+
+        console.log('image path ', oldImagePath)
+
+        fs.unlink(oldImagePath, (err) => {
+          if (err) {
+            console.warn("Old cover image delete failed:", err.message);
+          }
+        });
+      }
+
+          event.coverImage = `/uploads/events/${req.file.filename}`;
+    }
 
     event.modifiedUser = req.user?._id;
     await event.save();
-
-    console.log(event)
-
     res.json(event);
   } catch (err) {
     console.error('updateEvent error:', err);
@@ -203,9 +220,9 @@ exports.addEventImage = async (req, res) => {
     }
 
     /* ================= IMAGE UPLOAD ================= */
-    let image_url = "";
+    //let image_url = "";
 
-    if (req.file) {
+   /* if (req.file) {
       const uploadRes = await imagekit.upload({
         file: req.file.buffer,
         fileName: req.file.originalname,
@@ -213,7 +230,10 @@ exports.addEventImage = async (req, res) => {
       });
 
       image_url = uploadRes.url;
-    }
+    }*/
+
+    const image_url = req.file ? `/uploads/events/${req.file.filename}` : undefined;
+
 
     /* ================= SAVE IMAGE ================= */
     const image = new EventImage({
@@ -294,7 +314,7 @@ exports.updateEventImage = async (req, res) => {
     }
 
     /* ================= IMAGE REPLACE ================= */
-    if (req.file) {
+    /*if (req.file) {
       const uploadRes = await imagekit.upload({
         file: req.file.buffer,
         fileName: req.file.originalname,
@@ -302,7 +322,25 @@ exports.updateEventImage = async (req, res) => {
       });
 
       image.url = uploadRes.url;
-    }
+    }*/
+
+    if (req.file) 
+        {
+          // Delete old file if exists
+              if ( image.url) {
+                const oldImagePath = path.join(
+                  __dirname,
+                  "..",
+                  image.url
+                );       
+                fs.unlink(oldImagePath, (err) => {
+                  if (err) {
+                    console.warn("Old cover image delete failed:", err.message);
+                  }
+                });
+              }
+           image.url = `/uploads/events/${req.file.filename}`;
+        }
 
     /* ================= UPDATE FIELDS ================= */
     if (caption !== undefined) image.caption = caption;

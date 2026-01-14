@@ -14,7 +14,7 @@ const About = () => {
   const [ads, setAds] = useState([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
   const [loadingAds, setLoadingAds] = useState(true);
-
+ const backend_url = import.meta.env.VITE_BACKEND_URL;
   useEffect(() => {
     const fetchEvents = async () => {
       try {
@@ -81,7 +81,7 @@ const About = () => {
                       <div className="bg-white rounded-xl p-3 shadow-sm border hover:shadow-md transition">
                         {event.coverImage ? (
                           <img
-                            src={event.coverImage}
+                            src={`${backend_url}${event.coverImage}`}
                             className="h-32 w-full object-cover rounded-lg mb-3"
                             alt={event.name}
                           />
@@ -160,7 +160,7 @@ const About = () => {
                       <div className="bg-white rounded-xl p-3 shadow-sm border hover:shadow-md transition">
                         <Link to={ad.link} target="_blank">
                           <img
-                            src={ad.image}
+                            src={`${backend_url}${ad.image}`}
                             alt={ad.name}
                             className="h-32 w-full object-cover rounded-lg mb-3"
                           />

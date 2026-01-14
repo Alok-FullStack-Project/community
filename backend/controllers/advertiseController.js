@@ -1,6 +1,8 @@
 // controllers/advertiseController.js
 const Advertise = require('../models/Advertise');
 const imagekit = require("../utils/imagekit");
+const path = require('path');
+const fs = require('fs');
 
 /**
  * Create new advertise
@@ -8,7 +10,7 @@ const imagekit = require("../utils/imagekit");
  */
 exports.createAdvertise = async (req, res) => {
   try {
- let image = "";
+ /*let image = "";
     if (req.file) {
       const uploadRes = await imagekit.upload({
         file: req.file.buffer,
@@ -17,11 +19,11 @@ exports.createAdvertise = async (req, res) => {
       });
 
       image = uploadRes.url;
-    }
+    }*/
 
 
     const { name, startDate, endDate, publish,link,mobile,priority,description,order  } = req.body; //,category
-    //const image = req.file ? `/uploads/advertise/${req.file.filename}` : undefined;
+    const image = req.file ? `/uploads/advertise/${req.file.filename}` : undefined;
 
     const advertise = new Advertise({
       name,
@@ -120,7 +122,7 @@ exports.updateAdvertise = async (req, res) => {
     if (!advertise) return res.status(404).json({ message: 'Advertise not found' });
 
      //let image = "";
-    if (req.file) {
+   /* if (req.file) {
       const uploadRes = await imagekit.upload({
         file: req.file.buffer,
         fileName: req.file.originalname,
@@ -129,7 +131,7 @@ exports.updateAdvertise = async (req, res) => {
 
      // image = uploadRes.url;
      advertise.image = uploadRes.url;
-    }
+    }*/
 
     const { name, startDate, endDate, publish,link,mobile,priority,description,order  } = req.body; //,category
     if (name) advertise.name = name;
@@ -142,7 +144,24 @@ exports.updateAdvertise = async (req, res) => {
     if (priority) advertise.priority = priority;
     if (description) advertise.description = description;
     if (order) advertise.order = order;
-   //if (req.file) advertise.image = `/uploads/advertise/${req.file.filename}`;
+   if (req.file) 
+   {
+     // Delete old file if exists
+          if (advertise.image) {
+            const oldImagePath = path.join(
+              __dirname,
+              "..",
+              advertise.image
+            );
+    
+            fs.unlink(oldImagePath, (err) => {
+              if (err) {
+                console.warn("Old cover image delete failed:", err.message);
+              }
+            });
+          }
+      advertise.image = `/uploads/advertise/${req.file.filename}`;
+   }
     advertise.modifiedUser = req.user._id;
 
     await advertise.save();

@@ -7,6 +7,7 @@ const Slider = () => {
   const [images, setImages] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
+  const backend_url = import.meta.env.VITE_BACKEND_URL;
 
   /* ================= FETCH DATA ================= */
   useEffect(() => {
@@ -60,7 +61,7 @@ const Slider = () => {
           {images.map((img, idx) => (
             <div key={idx} className="min-w-full h-full relative overflow-hidden">
               <img
-                src={img.url}
+                src={`${backend_url}${img.url}`}
                 alt={img.caption || "Community Image"}
                 // object-cover ensures no stretching
                 // object-center keeps the middle of the image visible

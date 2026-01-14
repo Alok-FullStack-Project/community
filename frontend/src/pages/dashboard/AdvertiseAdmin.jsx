@@ -13,6 +13,7 @@ export default function AdvertiseAdmin() {
   const [statusFilter, setStatusFilter] = useState("all"); // NEW
   const [page, setPage] = useState(1);
   const rowsPerPage = 10;
+  const backend_url = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     fetchAds();
@@ -226,7 +227,7 @@ export default function AdvertiseAdmin() {
                     <td className="px-4 py-3">
                       {ad.image ? (
                         <img
-                          src={ad.image}
+                           src={`${backend_url}${ad.image}`}
                           className="h-12 w-12 rounded object-cover shadow"
                         />
                       ) : (

@@ -2,6 +2,8 @@ const Family = require("../models/Family");
 const FamilyMember = require("../models/FamilyMember");
 const mongoose = require("mongoose");
 const imagekit = require("../utils/imagekit");
+const path = require('path');
+const fs = require('fs');
 
 const PREFIX = '42KPS';
 
@@ -89,8 +91,8 @@ exports.createFamily = async (req, res) => {
      // Generate family head code
     const headId = await generateFamilyCode();
 
-        //    const image = req.file ? `/uploads/family/${req.file.filename}` : undefined;
-        let image = "";
+            const image = req.file ? `/uploads/family/${req.file.filename}` : undefined;
+      /*  let image = "";
           if (req.file) {
             const uploadRes = await imagekit.upload({
               file: req.file.buffer,
@@ -100,6 +102,7 @@ exports.createFamily = async (req, res) => {
       
             image = uploadRes.url;
           }
+      */
 
     // Create Family first
     const family = new Family({
@@ -395,7 +398,7 @@ exports.updateFamily = async (req, res) => {
       return res.status(404).json({ message: 'Family not found' });
     }
 
-    let image = "";
+    /*let image = "";
     if (req.file) {
       const uploadRes = await imagekit.upload({
         file: req.file.buffer,
@@ -405,7 +408,26 @@ exports.updateFamily = async (req, res) => {
 
       image = uploadRes.url;
       family.image = image;
-    }
+    }*/
+
+if (req.file) 
+{
+  // Delete old file if exists
+      if (family.image) {
+        const oldImagePath = path.join(
+          __dirname,
+          "..",
+          family.image
+        );       
+        fs.unlink(oldImagePath, (err) => {
+          if (err) {
+            console.warn("Old cover image delete failed:", err.message);
+          }
+        });
+      }
+      family.image = `/uploads/family/${req.file.filename}`;
+}
+
 
     // Update all editable fields dynamically
     Object.keys(updateData).forEach((key) => {
@@ -529,17 +551,13 @@ exports.updateMember = async (req, res) => {
     const { memberId } = req.params; // memberId from URL
     const updateData = req.body;
 
-        console.log("Req body : " , updateData);
-
-
-
     // Validate if member exists
     const member = await FamilyMember.findById(memberId);
     if (!member) {
       return res.status(404).json({ message: 'Member not found' });
     }
 
-    let image = "";
+   /* let image = "";
     if (req.file) {
       const uploadRes = await imagekit.upload({
         file: req.file.buffer,
@@ -549,7 +567,25 @@ exports.updateMember = async (req, res) => {
 
       image = uploadRes.url;
       member.image = image;
-    }
+    } */
+
+      if (req.file) 
+{
+  // Delete old file if exists
+      if (member.image) {
+        const oldImagePath = path.join(
+          __dirname,
+          "..",
+          member.image
+        );       
+        fs.unlink(oldImagePath, (err) => {
+          if (err) {
+            console.warn("Old cover image delete failed:", err.message);
+          }
+        });
+      }
+      member.image = `/uploads/family/${req.file.filename}`;
+}
 
 
 

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import api from "../../api/api";
 import { Section } from "../../components/Section";
 
+
 export default function EventAdmin() {
   const [events, setEvents] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -22,6 +23,8 @@ export default function EventAdmin() {
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
+
+  const backend_url = import.meta.env.VITE_BACKEND_URL;
 
   // Load categories
   const fetchCategories = async () => {
@@ -248,7 +251,7 @@ export default function EventAdmin() {
                   <td className="border px-3 py-2">
                     {event.coverImage ? (
                       <img
-                        src={event.coverImage}
+                        src={`${backend_url}${event.coverImage}`}
                         alt={event.name}
                         className="h-12 w-20 object-cover rounded"
                       />

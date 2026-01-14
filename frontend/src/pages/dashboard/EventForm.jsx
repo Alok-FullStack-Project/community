@@ -17,6 +17,7 @@ export default function EventForm() {
   const [event, setEvent] = useState(emptyEvent);
   const [categories, setCategories] = useState([]);
   const isEdit = Boolean(id);
+  const backend_url = import.meta.env.VITE_BACKEND_URL;
 
   // ------------------------------
   // Fetch Categories
@@ -201,7 +202,7 @@ export default function EventForm() {
             />
           ) : event.coverImage ? (
             <img
-              src={event.coverImage}
+               src={`${backend_url}${event.coverImage}`}
               alt="preview"
               className="h-40 mt-3 rounded shadow"
             />

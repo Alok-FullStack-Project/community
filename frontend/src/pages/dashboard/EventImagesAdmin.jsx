@@ -24,6 +24,7 @@ export default function EventImagesAdmin() {
   const [editSlider, setEditSlider] = useState(false);
   const [editGallery, setEditGallery] = useState(true);
   const [editFile, setEditFile] = useState(null);
+  const backend_url = import.meta.env.VITE_BACKEND_URL;
 
   /* ================= FETCH ================= */
 
@@ -210,7 +211,7 @@ export default function EventImagesAdmin() {
           <div key={img._id} className="bg-white shadow border rounded-lg p-3">
 
             <img
-              src={img.url}
+              src={`${backend_url}${img.url}`}
               alt={img.caption}
               className="h-40 w-full object-cover rounded mb-2"
             />

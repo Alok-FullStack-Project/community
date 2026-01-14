@@ -23,6 +23,7 @@ export default function AdvertiseForm() {
 
   const [advertise, setAdvertise] = useState(emptyAd);
   const [loading, setLoading] = useState(false);
+  const backend_url = import.meta.env.VITE_BACKEND_URL;
 
   useEffect(() => {
     if (id) fetchAd();
@@ -260,7 +261,7 @@ export default function AdvertiseForm() {
                   src={
                     advertise.file
                       ? URL.createObjectURL(advertise.file)
-                      : advertise.image
+                      : `${backend_url}${advertise.image}`
                   }
                   alt="Preview"
                   className="w-full h-48 object-cover rounded-lg border shadow"
