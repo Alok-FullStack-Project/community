@@ -24,7 +24,8 @@ const Advertise = () => {
   const getImageUrl = (path) => {
     if (!path) return null;
     if (path.startsWith("http")) return path;
-    return path.startsWith("/") ? backend_url + path : backend_url + "/" + path;
+    return backend_url + path;
+    //return path.startsWith("/") ? backend_url + path : backend_url + "/" + path;
   };
 
   const handleVisit = async (ad, action) => {
