@@ -19,13 +19,12 @@ const Advertise = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [selectedAd, setSelectedAd] = useState(null);
-  const backend_url = import.meta.env.VITE_URL;
+  const backend_url = import.meta.env.VITE_BACKEND_URL;
 
   const getImageUrl = (path) => {
     if (!path) return null;
     if (path.startsWith("http")) return path;
-    return backend_url + path;
-    //return path.startsWith("/") ? backend_url + path : backend_url + "/" + path;
+    return path.startsWith("/") ? backend_url + path : backend_url + "/" + path;
   };
 
   const handleVisit = async (ad, action) => {
