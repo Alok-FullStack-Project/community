@@ -6,7 +6,7 @@ import { useParams, Link } from "react-router-dom";
 
 const FamilyView = () => {
   const { familyId, memberId } = useParams();
-  const [member, setMember] = useState(null);
+  const [member, setMember] = useState(null); 
 
   useEffect(() => {
     const fetchMember = async () => {

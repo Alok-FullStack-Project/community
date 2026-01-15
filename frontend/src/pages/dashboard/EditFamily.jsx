@@ -2,10 +2,10 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 
-const API_BASE = import.meta.env.VITE_API_URL + '/family';
+const API_BASE = import.meta.env.VITE_API_URL + '/family'; 
 
 export default function EditFamily() {
-  const { role, familyId, memberIdx } = useParams();
+  const { role, familyId, memberIdx } = useParams(); 
   const navigate = useNavigate();
 
   const [family, setFamily] = useState(null);

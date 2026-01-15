@@ -1,185 +1,151 @@
 import React, { useEffect, useState } from "react";
-import Slider from "../components/Slider";
 import api from "../api/api";
-import { Link } from "react-router-dom";
 import { format } from "date-fns";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Autoplay } from "swiper/modules";
-
-import "swiper/css";
-import "swiper/css/navigation";
+import { Users, Target, Shield, Award, Linkedin, Mail, ArrowRight, MapPin } from "lucide-react";
 
 const About = () => {
   const [events, setEvents] = useState([]);
-  const [ads, setAds] = useState([]);
   const [loadingEvents, setLoadingEvents] = useState(true);
-  const [loadingAds, setLoadingAds] = useState(true);
- const backend_url = import.meta.env.VITE_BACKEND_URL;
+  const backend_url = import.meta.env.VITE_URL;
+
+  // Static Team Data (You can also fetch this from an API)
+  const team = [
+  { 
+    name: "XYZ Patel", 
+    role: "President", 
+    village: "Sathamba", 
+    image: "/no_image.png" 
+  },
+  { 
+    name: "XYZ Patel", 
+    role: "Secretary", 
+    village: "Sathamba", 
+    image: "/no_image.png" 
+  },
+  { 
+    name: "XYZ Patel", 
+    role: "Treasurer", 
+    village: "Sathamba", 
+    image: "/no_image.png" 
+  },
+  { 
+    name: "XYZ Patel", 
+    role: "Community Lead", 
+    village: "Sathamba", 
+    image: "/no_image.png" 
+  },
+];
+
   useEffect(() => {
     const fetchEvents = async () => {
       try {
         const res = await api.get("/events");
         setEvents(res.data.data || []);
-      } catch (err) {
-        console.error("Error fetching events:", err);
-      } finally {
-        setLoadingEvents(false);
-      }
+      } catch (err) { console.error(err); } 
+      finally { setLoadingEvents(false); }
     };
     fetchEvents();
   }, []);
 
-  useEffect(() => {
-    const fetchAds = async () => {
-      try {
-        const res = await api.get("/advertise/active");
-        const filtered = (res.data.data || []).filter((a) => a.publish !== false);
-        setAds(filtered);
-      } catch (err) {
-        console.error("Failed to fetch adverts", err);
-      } finally {
-        setLoadingAds(false);
-      }
-    };
-    fetchAds();
-  }, []);
-
   return (
-    <>
-      <Slider />
-
-      <section className="px-6 py-14 bg-gradient-to-b from-indigo-50 to-white min-h-screen w-full">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-10 max-w-[1600px] mx-auto">
-
-          {/* EVENTS SLIDER */}
-          <div className="md:col-span-3 bg-white rounded-3xl shadow-xl p-6 border border-gray-100 relative">
-            <h2 className="text-xl font-bold mb-4 text-center text-indigo-700">Upcoming Events</h2>
-
-            {loadingEvents ? (
-              <p className="text-gray-500 text-center">Loading events...</p>
-            ) : events.length === 0 ? (
-              <p className="text-gray-500 text-center">No events available.</p>
-            ) : (
-              <>
-                <Swiper
-                  modules={[Navigation, Autoplay]}
-                  autoplay={{ delay: 1800 }}
-                  loop={true}
-                  navigation={{
-                    nextEl: ".event-next",
-                    prevEl: ".event-prev",
-                  }}
-                  breakpoints={{
-                    0: { direction: "horizontal", slidesPerView: 1 },
-                    768: { direction: "vertical", slidesPerView: 3 },
-                  }}
-                  spaceBetween={20}
-                  className="md:h-[650px]"
-                >
-                  {events.map((event) => (
-                    <SwiperSlide key={event._id}>
-                      <div className="bg-white rounded-xl p-3 shadow-sm border hover:shadow-md transition">
-                        {event.coverImage ? (
-                          <img
-                            src={`${backend_url}${event.coverImage}`}
-                            className="h-32 w-full object-cover rounded-lg mb-3"
-                            alt={event.name}
-                          />
-                        ) : (
-                          <div className="h-32 flex items-center justify-center bg-gray-200 rounded-lg text-gray-400 mb-3">
-                            No Image
-                          </div>
-                        )}
-
-                        <h3 className="font-semibold text-sm text-gray-800">{event.name}</h3>
-                        <p className="text-xs text-gray-600">
-                          {event.description?.slice(0, 60)}...
-                        </p>
-
-                        <Link to={`/events/${event._id}`} className="text-indigo-600 text-xs hover:underline mt-2 inline-block">
-                          View →
-                        </Link>
-                      </div>
-                    </SwiperSlide>
-                  ))}
-                </Swiper>
-
-                <button className="event-prev swiper-button-prev absolute left-1/2 -translate-x-1/2 top-3"></button>
-                <button className="event-next swiper-button-next absolute left-1/2 -translate-x-1/2 bottom-3"></button>
-              </>
-            )}
+    <div className="bg-white">
+      {/* ================= HERO SECTION ================= */}
+      <section className="relative pt-32 pb-20 bg-slate-900 overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-full opacity-20">
+          <div className="absolute top-[-10%] right-[-10%] w-[50%] h-[70%] bg-indigo-600 rounded-full blur-[120px]" />
+        </div>
+        
+        <div className="relative z-10 max-w-7xl mx-auto px-6">
+          <div className="max-w-3xl">
+            <h1 className="text-5xl md:text-4xl font-black text-white mb-6 leading-tight">
+              Building a Stronger <span className="text-indigo-400">Community</span> Together.
+            </h1>
+           
           </div>
-
-          {/* ABOUT SECTION */}
-          <div className="md:col-span-6 bg-white rounded-3xl shadow-xl p-10 border border-gray-100 text-center">
-            <h2 className="text-4xl font-extrabold mb-6 text-indigo-700">
-              Our Community Story
-            </h2>
-
-            <p className="text-gray-700 mb-4 text-lg leading-relaxed">
-              Our community thrives on shared culture, unity, and togetherness. Built
-              over generations, our traditions continue to inspire and connect us.
-            </p>
-
-            <p className="text-gray-700 text-lg leading-relaxed">
-              We honor our heritage while empowering future generations to stay
-              connected, grow, and succeed together.
-            </p>
-
-            {/* Decorative Divider */}
-            <div className="w-20 h-1 bg-indigo-600 rounded-full mx-auto mt-6"></div>
-          </div>
-
-          {/* ADS SLIDER */}
-          <div className="md:col-span-3 bg-white rounded-3xl shadow-xl p-6 border border-gray-100 relative">
-            <h2 className="text-xl font-bold mb-4 text-center text-indigo-700">Advertisements</h2>
-
-            {loadingAds ? (
-              <p className="text-gray-500 text-center">Loading ads...</p>
-            ) : ads.length === 0 ? (
-              <p className="text-gray-500 text-center">No ads available.</p>
-            ) : (
-              <>
-                <Swiper
-                  modules={[Navigation, Autoplay]}
-                  autoplay={{ delay: 2000 }}
-                  loop={true}
-                  navigation={{
-                    nextEl: ".ads-next",
-                    prevEl: ".ads-prev",
-                  }}
-                  breakpoints={{
-                    0: { direction: "horizontal", slidesPerView: 1 },
-                    768: { direction: "vertical", slidesPerView: 3 },
-                  }}
-                  spaceBetween={20}
-                  className="md:h-[650px]"
-                >
-                  {ads.map((ad) => (
-                    <SwiperSlide key={ad._id}>
-                      <div className="bg-white rounded-xl p-3 shadow-sm border hover:shadow-md transition">
-                        <Link to={ad.link} target="_blank">
-                          <img
-                            src={`${backend_url}${ad.image}`}
-                            alt={ad.name}
-                            className="h-32 w-full object-cover rounded-lg mb-3"
-                          />
-                        </Link>
-                      </div>
-                    </SwiperSlide>
-                  ))}
-                </Swiper>
-
-                <button className="ads-prev swiper-button-prev absolute left-1/2 -translate-x-1/2 top-3"></button>
-                <button className="ads-next swiper-button-next absolute left-1/2 -translate-x-1/2 bottom-3"></button>
-              </>
-            )}
-          </div>
-
         </div>
       </section>
-    </>
+
+    
+
+      {/* ================= TEAM SECTION ================= */}
+      <section className="py-24 bg-slate-50 mt-10">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="h-1 w-10 bg-indigo-600 rounded-full" />
+                <span className="text-indigo-600 font-bold uppercase tracking-widest text-xs">The Leadership</span>
+              </div>
+              <h2 className="text-4xl md:text-5xl font-black text-slate-900">Meet Our Team</h2>
+            </div>
+            <p className="max-w-md text-slate-500 text-lg">
+              The dedicated individuals working tirelessly to manage community affairs and events.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {team.map((member, idx) => (
+              <div key={idx} className="group relative">
+                <div className="relative overflow-hidden rounded-[2.5rem] bg-white p-3 shadow-sm transition-all duration-500 group-hover:shadow-2xl group-hover:-translate-y-2 border border-slate-100">
+                  
+                  {/* Image Container */}
+                  <div className="relative h-72 w-full overflow-hidden rounded-[2rem] bg-slate-100">
+                    <img 
+                      src={member.image === "/no_image.png" ? "https://ui-avatars.com/api/?name=" + member.name + "&background=6366f1&color=fff" : member.image} 
+                      alt={member.name}
+                      className="h-full w-full object-cover transition duration-700 group-hover:scale-110" 
+                    />
+                    
+                    {/* Village Badge - Overlayed on image */}
+                    <div className="absolute bottom-4 left-4">
+                      <div className="flex items-center gap-1.5 px-3 py-1.5 bg-white/90 backdrop-blur-md rounded-xl shadow-sm border border-white/50">
+                        <span className="text-indigo-600"><MapPin size={12} fill="currentColor" fillOpacity={0.2} /></span>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-700">{member.village}</span>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Text Content */}
+                  <div className="p-6 text-center">
+                    <h3 className="text-xl font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">{member.name}</h3>
+                    <p className="text-slate-500 font-medium text-sm mt-1 mb-3">{member.role}</p>
+                    
+                   
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ================= STATS SECTION ================= */}
+      {/* <section className="py-20 bg-indigo-600">
+        <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+            <Stat num="5000+" label="Members" />
+            <Stat num="120+" label="Events Hosted" />
+            <Stat num="50+" label="Businesses" />
+            <Stat num="15+" label="Locations" />
+        </div>
+      </section> */}
+    </div>
   );
 };
+
+/* Helper Components */
+const ValueCard = ({ icon, title, desc }) => (
+  <div className="p-10 rounded-[3rem] bg-white border border-slate-100 hover:border-indigo-100 transition-all duration-500 group">
+    <div className="mb-6 p-4 bg-slate-50 w-fit rounded-2xl group-hover:scale-110 transition-transform">{icon}</div>
+    <h3 className="text-2xl font-bold text-slate-900 mb-4">{title}</h3>
+    <p className="text-slate-500 leading-relaxed">{desc}</p>
+  </div>
+);
+
+const Stat = ({ num, label }) => (
+  <div className="text-white">
+    <div className="text-4xl md:text-5xl font-black mb-2">{num}</div>
+    <div className="text-indigo-100 font-medium opacity-80 uppercase tracking-widest text-xs">{label}</div>
+  </div>
+);
 
 export default About;

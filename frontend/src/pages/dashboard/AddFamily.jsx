@@ -8,7 +8,7 @@ import { Section } from "../../components/Section";
   Features:
   - 5-step wizard
   - animated progress bar
-  - step validation (won't advance if invalid)
+  - step validation (won't advance if invalid) 
   - save draft to localStorage / load draft on mount
   - auto age calculation from birthDate
   - relation suggestions based on gender (click to apply)

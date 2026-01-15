@@ -6,7 +6,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 
 const emptyMember = {
   name: '',
-  gender: 'Male',
+  gender: 'Male', 
   relation: 'Head',
   birthDate: '',
   nativePlace: '',

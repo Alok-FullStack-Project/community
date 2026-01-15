@@ -48,7 +48,7 @@ export default function Footer() {
           <ul className="grid grid-cols-2 lg:grid-cols-1 gap-y-3 gap-x-8 text-sm">
             {[
               { name: "Home", path: "/" },
-              // { name: "About Us", path: "/about" },
+              { name: "About Us", path: "/about" },
               { name: "Communities", path: "/community" },
               { name: "Events", path: "/events" },
               { name: "Advertise", path: "/advertise" },
@@ -87,8 +87,8 @@ export default function Footer() {
               <div className="p-2 rounded-lg bg-slate-900 border border-slate-800 group-hover:border-indigo-500 transition-colors">
                 <Phone size={16} className="text-indigo-400" />
               </div>
-              <a href="tel:+919427022568" className="hover:text-white transition-colors">
-                +91 94270 22568
+              <a href="tel:+919638334737" className="hover:text-white transition-colors">
+                +91 96383 34737
               </a>
             </li>
 
@@ -96,8 +96,8 @@ export default function Footer() {
               <div className="p-2 rounded-lg bg-slate-900 border border-slate-800 group-hover:border-indigo-500 transition-colors">
                 <Mail size={16} className="text-indigo-400" />
               </div>
-              <a href="mailto:hello@community.com" className="hover:text-white transition-colors">
-                hello@community.com
+              <a href="mailto:42sathambakadvapatidar@gmail.com" className="hover:text-white transition-colors">
+                42sathambakadvapatidar@gmail.com
               </a>
             </li>
           </ul>
@@ -134,11 +134,11 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-6 mt-16 pt-8 border-t border-slate-800/50">
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-[13px]">
           <p className="text-slate-500">
-            © {currentYear} <span className="text-slate-300 font-semibold">42 Kadva Patidar Samaj</span>. All rights reserved.
+            © {currentYear} <span className="text-slate-300 font-semibold">42 Kadva Patidar Samaj, Sathamba</span>. All rights reserved.
           </p>
           <div className="flex gap-6 text-slate-500">
-            <Link to="/privacy" className="hover:text-indigo-400 transition-colors">Privacy Policy</Link>
-            <Link to="/terms" className="hover:text-indigo-400 transition-colors">Terms of Service</Link>
+            <Link to="#" className="hover:text-indigo-400 transition-colors">Privacy Policy</Link>
+            <Link to="#" className="hover:text-indigo-400 transition-colors">Terms of Service</Link>
           </div>
         </div>
       </div>
