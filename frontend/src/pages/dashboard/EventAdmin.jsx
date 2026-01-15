@@ -39,59 +39,19 @@ export default function EventAdmin() {
   try {
     setLoading(true);
 
-    const res = await api.get("/events");
-    const all = res.data.data || res.data || [];
+    const res = await api.get("/events", {
+      params: {
+        page,
+        limit,
+        q: search || undefined,
+        publish: filterStatus !== "" ? filterStatus : undefined,
+        sortField,
+        sortOrder,
+      },
+    });
 
-    // Apply search filter (frontend)
-    let filtered = all.filter((ev) =>
-      ev.name.toLowerCase().includes(search.toLowerCase())
-    );
-
-    // Filter category
-    if (filterCategory) {
-      filtered = filtered.filter(
-        (ev) => ev.category?._id === filterCategory
-      );
-    }
-
-    // Filter status
-    if (filterStatus !== "") {
-      filtered = filtered.filter(
-        (ev) => String(ev.publish) === filterStatus
-      );
-    }
-
-    // Sorting (frontend)
-    if (sortField === "name") {
-      filtered.sort((a, b) =>
-        sortOrder === "asc"
-          ? a.name.localeCompare(b.name)
-          : b.name.localeCompare(a.name)
-      );
-    }
-
-    if (sortField === "category") {
-      filtered.sort((a, b) =>
-        sortOrder === "asc"
-          ? (a.category?.name || "").localeCompare(b.category?.name || "")
-          : (b.category?.name || "").localeCompare(a.category?.name || "")
-      );
-    }
-
-    if (sortField === "createdAt") {
-      filtered.sort((a, b) =>
-        sortOrder === "asc"
-          ? new Date(a.createdAt) - new Date(b.createdAt)
-          : new Date(b.createdAt) - new Date(a.createdAt)
-      );
-    }
-
-    // Pagination (frontend)
-    const start = (page - 1) * limit;
-    const paginated = filtered.slice(start, start + limit);
-    setTotalPages(Math.ceil(filtered.length / limit));
-
-    setEvents(paginated);
+    setEvents(res.data.data);
+    setTotalPages(res.data.totalPages);
   } catch (err) {
     console.error(err);
     alert("Failed to load events");
@@ -103,7 +63,7 @@ export default function EventAdmin() {
 
   useEffect(() => {
     fetchEvents();
-    fetchCategories();
+    //fetchCategories();
   }, [page, sortField, sortOrder]);
 
   // Search Debounce
@@ -137,13 +97,13 @@ export default function EventAdmin() {
 
   // Sorting Handler
   const handleSort = (field) => {
-    if (sortField === field) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
-      setSortOrder("asc");
-    }
-  };
+  if (sortField === field) {
+    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+  } else {
+    setSortField(field);
+    setSortOrder("asc");
+  }
+};
 
   return (
     <>

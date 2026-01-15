@@ -56,28 +56,43 @@ exports.createEvent = async (req, res) => {
  */
 exports.listEvents = async (req, res) => {
   try {
-    const { q, publish, page = 1, limit = 20 } = req.query;
+    const {
+      q,
+      publish,
+      page = 1,
+      limit = 20,
+      sortField = "createdAt",
+      sortOrder = "desc",
+    } = req.query;
+
     const filters = {};
 
     if (q) {
-      const re = new RegExp(q, 'i');
+      const re = new RegExp(q, "i");
       filters.$or = [{ name: re }, { description: re }];
     }
 
-    if (publish !== undefined) filters.publish = publish === 'true';
+    if (publish !== undefined) {
+      filters.publish = publish === "true";
+    }
 
-    const pageNum = Math.max(1, parseInt(page, 10));
-    const limitNum = Math.max(1, parseInt(limit, 10));
+    const pageNum = Math.max(1, parseInt(page));
+    const limitNum = Math.max(1, parseInt(limit));
     const skip = (pageNum - 1) * limitNum;
 
+    // ✅ SORT OBJECT
+    const sort = {
+      [sortField]: sortOrder === "asc" ? 1 : -1,
+    };
+
     const total = await Event.countDocuments(filters);
+
     const data = await Event.find(filters)
-    // .populate("category", "name type")
-      .sort({ createdDate: -1 })
+      .sort(sort)
       .skip(skip)
       .limit(limitNum)
-      .populate('createdUser', 'name email')
-      .populate('modifiedUser', 'name email')
+      .populate("createdUser", "name email")
+      .populate("modifiedUser", "name email")
       .lean();
 
     res.json({
@@ -88,8 +103,8 @@ exports.listEvents = async (req, res) => {
       data,
     });
   } catch (err) {
-    console.error('listEvents error:', err);
-    res.status(500).json({ message: 'Server error' });
+    console.error("listEvents error:", err);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
