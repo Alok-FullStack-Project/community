@@ -256,26 +256,48 @@ export default function UserForm() {
                 {/* ROLE DEPENDENT: VILLAGES */}
                 {user.role === "representative" && (
                   <div className="bg-slate-50 rounded-[2rem] p-6 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                    <div className="flex items-center justify-between">
-                      <label className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-slate-500 ml-1">
-                        <MapPin size={14} /> Assigned Jurisdictions
-                      </label>
-                      <span className="text-[10px] font-bold text-indigo-600 bg-white px-3 py-1 rounded-full shadow-sm">{user.nativePlaces.length} Selected</span>
-                    </div>
-                    {user.nativePlaces?.length > 0 && (
-                      <div className="flex flex-wrap gap-2">
-                        {user.nativePlaces.map((place) => (
-                          <span
-                            key={place}
-                            className="flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-bold
-                                      bg-indigo-100 text-indigo-700"
-                          >
-                            <MapPin size={12} />
-                            {place}
-                          </span>
-                        ))}
-                      </div>
-                    )}
+                    {user.role === "representative" && (
+  <div className="bg-slate-50 rounded-[2rem] p-6 space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
+    <div className="flex items-center justify-between">
+      <label className="flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-slate-500 ml-1">
+        <MapPin size={14} /> Assigned Jurisdictions
+      </label>
+
+      <span className="text-[10px] font-bold text-indigo-600 bg-white px-3 py-1 rounded-full shadow-sm">
+        {user.nativePlaces?.length || 0} Assigned
+      </span>
+    </div>
+
+    {user.nativePlaces?.length > 0 ? (
+      <div className="flex flex-wrap gap-2">
+        {user.nativePlaces.map((place) => (
+          <button
+            key={place}
+            type="button"
+            onClick={() =>
+              setUser((prev) => ({
+                ...prev,
+                nativePlaces: prev.nativePlaces.filter((p) => p !== place),
+              }))
+            }
+            className="flex items-center gap-2 px-3 py-1 rounded-full
+                       text-[11px] font-bold bg-indigo-100 text-indigo-700
+                       hover:bg-red-100 hover:text-red-700 transition"
+          >
+            <MapPin size={12} />
+            {place}
+            <X size={12} />
+          </button>
+        ))}
+      </div>
+    ) : (
+      <p className="text-xs text-slate-400 italic">
+        No villages assigned
+      </p>
+    )}
+  </div>
+)}
+
 
                     <div className="relative">
                       <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={16} />
