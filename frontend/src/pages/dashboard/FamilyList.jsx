@@ -176,7 +176,13 @@ const FamilyList = ({ role }) => {
                 </div>
 
                 <div className="flex items-center gap-2 w-full md:w-auto border-t md:border-t-0 pt-3 md:pt-0">
-                  <button onClick={() => {setSelectedMember(family); setShowModal(true);}} className="flex-1 md:flex-none p-3 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-600 hover:text-white transition-all"><Eye size={18}/></button>
+                  <button onClick={() => {setSelectedMember(family); setShowModal(true);}} className="flex-1 md:flex-none p-3 bg-indigo-50 text-indigo-600 rounded-xl hover:bg-indigo-600 hover:text-white transition-all">
+                   <p>permission : {String(hasPermission(family))}</p>
+                     <p> village : {family.village}</p>
+                     <p>  user village : {user.nativePlaces}</p>
+                    
+                    <Eye size={18}/>
+                    </button>
                   {hasPermission(family) && (
                     <>
                       <Link to={`/dashboard/${role}/edit-family/${family._id}/head`} className="flex-1 md:flex-none p-3 bg-amber-50 text-amber-600 rounded-xl hover:bg-amber-400 hover:text-white transition-all flex justify-center"><Edit3 size={18}/></Link>
