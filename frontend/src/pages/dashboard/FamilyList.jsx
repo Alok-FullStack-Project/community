@@ -132,6 +132,14 @@ const FamilyList = ({ role }) => {
     setExpandedFamilies(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
   };
 
+  const sortedFamilies = [...families].sort((a, b) => {
+  const aPerm = hasPermission(a);
+  const bPerm = hasPermission(b);
+
+  if (aPerm === bPerm) return 0;
+  return aPerm ? -1 : 1;
+});
+
   return (
     <div className="min-h-screen bg-slate-50 pb-20 mt-10">
       
@@ -178,7 +186,7 @@ const FamilyList = ({ role }) => {
         <div className="space-y-4">
           {loading ? (
             <div className="text-center py-20"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600 mx-auto" /></div>
-          ) : families.map((family) => (
+          ) : sortedFamilies.map((family) => (
             <div key={family._id} className="bg-white rounded-[2rem] border border-slate-100 shadow-sm overflow-hidden transition-all">
               <div className="p-4 md:p-6 flex flex-col md:flex-row items-center gap-4">
                 <div className="flex items-center gap-4 flex-grow w-full cursor-pointer" onClick={() => toggleFamily(family._id)}>

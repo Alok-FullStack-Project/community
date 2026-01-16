@@ -113,7 +113,15 @@ export default function AddFamilyWizard() {
   async function loadVillages() {
     try {
       const res = await api.get("/villages/all");
-      setVillages(res.data.data || res.data || []);
+      const availableVillages = res.data.data.filter((v) =>
+  user.nativePlaces
+    .map(p => p.toLowerCase())
+    .includes(v.name.toLowerCase())
+);
+console.log(availableVillages)
+      //setVillages(res.data.data || res.data || []);
+      setVillages(availableVillages)
+
     } catch (err) {
       console.error("loadVillages error", err);
       setVillages([]);
