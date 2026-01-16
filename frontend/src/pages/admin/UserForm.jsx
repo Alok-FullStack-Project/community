@@ -262,6 +262,20 @@ export default function UserForm() {
                       </label>
                       <span className="text-[10px] font-bold text-indigo-600 bg-white px-3 py-1 rounded-full shadow-sm">{user.nativePlaces.length} Selected</span>
                     </div>
+                    {user.nativePlaces?.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {user.nativePlaces.map((place) => (
+                          <span
+                            key={place}
+                            className="flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-bold
+                                      bg-indigo-100 text-indigo-700"
+                          >
+                            <MapPin size={12} />
+                            {place}
+                          </span>
+                        ))}
+                      </div>
+                    )}
 
                     <div className="relative">
                       <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={16} />
